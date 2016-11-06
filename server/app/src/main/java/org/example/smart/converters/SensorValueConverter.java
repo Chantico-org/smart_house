@@ -22,7 +22,9 @@ public class SensorValueConverter {
     @Override
     protected void encode(ChannelHandlerContext ctx, SensorValue msg, ByteBuf out) throws Exception {
       System.out.println("encode");
+      System.out.println(msg);
       out.writeByte(MARKER);
+//      ctx.close();
     }
   }
   public static class SensorValueDecoder extends ByteToMessageDecoder {
