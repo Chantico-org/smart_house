@@ -1,0 +1,4 @@
+rootProject.name = 'example'
+include 'java_client'
+include 'smart_house_server'
+
