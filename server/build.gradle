@@ -1,0 +1,30 @@
+buildscript {
+  ext.kotlin_version = '1.0.6'
+
+  repositories {
+    mavenCentral()
+  }
+
+  dependencies {
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+  }
+}
+
+apply plugin: "kotlin"
+apply plugin: "application"
+mainClassName = "org.example.myhome.LauncherKt"
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+  // https://mvnrepository.com/artifact/io.netty/netty-all
+  compile group: 'io.netty', name: 'netty-all', version: '4.1.7.Final'
+  // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+  compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.22'
+  // https://mvnrepository.com/artifact/org.slf4j/slf4j-log4j12
+  compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.22'
+  // https://mvnrepository.com/artifact/log4j/log4j
+  compile group: 'log4j', name: 'log4j', version: '1.2.17'
+}
