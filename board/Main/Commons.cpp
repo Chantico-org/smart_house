@@ -24,9 +24,17 @@ bool smart::isValidAP(String ssid) {
 }
 
 char* smart::allocCharP(String &source) {
-  const int sourceLength = source.length();
-  char *result  = new char[sourceLength + 1];
-  source.toCharArray(result, sourceLength + 1);
+  // to include null terminator
+  const int sourceLength = source.length() + 1;
+  char *result  = new char[sourceLength];
+  source.toCharArray(result, sourceLength);
+  return result;
+}
+
+char* smart::allocCharP(const char* source) {
+  const int sourceLength = strlen(source) + 1;
+  char *result  = new char[sourceLength];
+  strcpy(result, source);
   return result;
 }
 
@@ -37,27 +45,29 @@ bool smart::connectToAP(int timeout) {
   WiFi.begin(ssid, password);
   unsigned long begin_millis = millis();
   #ifdef DEBUG_COMMONS
-  Serial.printf("Connecting to %s [%s]\n", ssid, password);
+  Serial.print(F("Connecting to "));
+  Serial.printf("%s [%s]\n", ssid, password);
   #endif
   while (WiFi.status() != WL_CONNECTED)
   {
     if(millis() - begin_millis > timeout) {
       #ifdef DEBUG_COMMONS
       Serial.println();
-      Serial.println("Connection timeout");
+      Serial.println(F("Connection timeout"));
       #endif
-      deviceState.isConnected = false;
+      deviceState.connectionStage = CONNECTION_STAGE_SERVER;
       return false;
     }
     delay(500);
     #ifdef DEBUG_COMMONS
-    Serial.print(".");
+    Serial.print(F("."));
     #endif
   }
   #ifdef DEBUG_COMMONS
-  Serial.println(" connected");
-  Serial.printf("IP [%s]\n", WiFi.localIP().toString().c_str());
+  Serial.println(F(" connected"));
+  Serial.print(F("IP "));
+  Serial.printf("[%s]\n", WiFi.localIP().toString().c_str());
   #endif
-  deviceState.isConnected = true;
+  deviceState.connectionStage = CONNECTION_STAGE_CONNECTED;
   return true;
 }

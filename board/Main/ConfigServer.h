@@ -5,6 +5,7 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include "Commons.h"
+#include "ConfigFile.h"
 
 #define DEBUG_CONFIG_SERVER
 
@@ -19,6 +20,21 @@ namespace smart {
 			void handleClient();
 			~ConfigServer();
 	};
+
+	void useConfigServer(ConfigServer*&);
+
+	void cleanConfigServer(ConfigServer*&);
+}
+
+inline void smart::useConfigServer(ConfigServer*& configServer) {
+	if (configServer == NULL) {
+		configServer = new smart::ConfigServer();
+	}
+	configServer->handleClient();
+}
+
+inline void smart::ConfigServer::handleClient() {
+	server->handleClient();
 }
 
 #endif // CONFIG_SERVER_H

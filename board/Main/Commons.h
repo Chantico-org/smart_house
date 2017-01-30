@@ -5,12 +5,17 @@
 
 #include <ESP8266WiFi.h>
 
-#define DEFAULT_TIME_OUT 10000
+
+#define DEFAULT_TIME_OUT 30000
+
+#define CONNECTION_STAGE_FILE 0
+#define CONNECTION_STAGE_SERVER 1
+#define CONNECTION_STAGE_CONNECTED 2
 
 namespace smart {
 	struct DeviceState
 	{
-		bool isConnected = false;
+		char connectionStage = CONNECTION_STAGE_FILE;
 		char* ssid = NULL;
 		char* password = NULL;
 	};
@@ -22,6 +27,7 @@ namespace smart {
 	bool connectToAP(int timeout = DEFAULT_TIME_OUT);
 
 	char* allocCharP(String&);
+	char* allocCharP(const char*);
 }
 
 #endif
