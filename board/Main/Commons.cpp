@@ -1,7 +1,7 @@
 #include "Commons.h"
 
 smart::DeviceState smart::deviceState;
-
+const char* smart::idFormat = "%X%X";
 bool smart::isValidAP(const char* ssid) {
   int networksFound = WiFi.scanNetworks();
   #ifdef DEBUG_COMMONS

@@ -22,5 +22,4 @@ fun main(args: Array<String>) {
     workerGroup,
     deviceServerInit
   )
-  deviceRegister.logger.debug("End goes here")
 }

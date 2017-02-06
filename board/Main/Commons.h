@@ -13,14 +13,20 @@
 #define CONNECTION_STAGE_CONNECTED 2
 
 namespace smart {
+  extern const char* idFormat;
+
 	struct DeviceState
 	{
+		char* deviceId = new char[16];
 		char connectionStage = CONNECTION_STAGE_FILE;
 		char* ssid = NULL;
 		char* password = NULL;
 	};
-	extern DeviceState deviceState;
 
+	extern DeviceState deviceState;
+	inline void initId() {
+  	sprintf(deviceState.deviceId, idFormat, ESP.getChipId(), ESP.getFlashChipId());
+	}
 	bool isValidAP(const char*);
 	bool isValidAP(String);
 

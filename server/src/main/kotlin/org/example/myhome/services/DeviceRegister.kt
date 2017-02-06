@@ -2,9 +2,7 @@ package org.example.myhome.services
 
 import com.google.common.eventbus.EventBus
 import com.google.common.eventbus.Subscribe
-import io.netty.channel.Channel
 import org.example.myhome.models.Device
-import org.example.myhome.models.DeviceMetaData
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -16,10 +14,9 @@ class DeviceRegister(val eventBus: EventBus){
   }
 
   @Subscribe
-  fun handleDeviceMetaData(deviceMetaDataEvent: Pair<DeviceMetaData, Channel>) {
-    val (deviceMetaData, channel) = deviceMetaDataEvent
-    logger.debug("Meta data received: $deviceMetaData")
-    devices + (deviceMetaData.deviceId to Device(channel))
+  fun handleDevice(device: Device) {
+    logger.debug("Meta data received: ${device.deviceMetaData}")
+    devices + (device.deviceMetaData.deviceId to device)
   }
 
   fun dispose() {

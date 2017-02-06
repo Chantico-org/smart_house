@@ -14,7 +14,7 @@ fun createDeviceServerInitializer(
   return object: ChannelInitializer<SocketChannel>(){
     override fun initChannel(ch: SocketChannel?) {
       ch?.pipeline()?.addLast(
-        LengthFieldBasedFrameDecoder(256, 0, 1, 0, 1),
+        LengthFieldBasedFrameDecoder(Int.MAX_VALUE, 0, 4, 0, 4),
         StringDecoder(),
         DeviceRegistration(eventBus)
       )
