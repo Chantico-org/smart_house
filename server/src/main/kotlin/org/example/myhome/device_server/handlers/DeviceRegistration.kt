@@ -6,18 +6,25 @@ import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
 import org.example.myhome.models.Device
 import org.example.myhome.models.DeviceMetaData
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Qualifier
+import kotlin.reflect.jvm.internal.impl.javax.inject.Inject
 
-class DeviceRegistration(val eventBus: EventBus) : ChannelInboundHandlerAdapter() {
+class DeviceRegistration(
+  val eventBus: EventBus
+) : ChannelInboundHandlerAdapter() {
   val gson = Gson()
+  val logger: Logger = LoggerFactory.getLogger(javaClass)
+
   override fun channelRead(ctx: ChannelHandlerContext?, msg: Any?) {
     if (ctx == null) {
       return
     }
     when(msg) {
       is String -> {
-        println("Received: $msg")
         val deviceMetaData = gson.fromJson(msg, DeviceMetaData::class.java)
-        println(deviceMetaData)
+        logger.debug("Device Meta data: $deviceMetaData")
         eventBus.post(Device(channel = ctx.channel(), deviceMetaData = deviceMetaData))
       }
     }

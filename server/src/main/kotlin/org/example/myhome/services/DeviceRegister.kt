@@ -5,8 +5,16 @@ import com.google.common.eventbus.Subscribe
 import org.example.myhome.models.Device
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.stereotype.Service
+import kotlin.reflect.jvm.internal.impl.javax.inject.Inject
 
-class DeviceRegister(val eventBus: EventBus){
+@Service
+class DeviceRegister(
+  @Inject
+  @Qualifier("eventBus")
+  val eventBus: EventBus
+){
   val devices: Map<String, Device> = emptyMap()
   val logger: Logger = LoggerFactory.getLogger(javaClass)
   init {
@@ -17,6 +25,11 @@ class DeviceRegister(val eventBus: EventBus){
   fun handleDevice(device: Device) {
     logger.debug("Meta data received: ${device.deviceMetaData}")
     devices + (device.deviceMetaData.deviceId to device)
+  }
+
+  @Subscribe
+  fun handleString(value:String) {
+    logger.debug(value)
   }
 
   fun dispose() {
