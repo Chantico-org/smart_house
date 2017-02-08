@@ -27,11 +27,6 @@ class DeviceRegister(
     devices + (device.deviceMetaData.deviceId to device)
   }
 
-  @Subscribe
-  fun handleString(value:String) {
-    logger.debug(value)
-  }
-
   fun dispose() {
     eventBus.unregister(this)
   }

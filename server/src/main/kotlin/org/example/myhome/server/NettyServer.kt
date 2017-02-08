@@ -16,14 +16,11 @@ fun startNettyServer(
   workerGroup: EventLoopGroup,
   initializer: ChannelInitializer<SocketChannel>
 ): ChannelFuture? {
-  val logger: Logger = LoggerFactory.getLogger("org.example.myhome.NettyServer")
   val b = ServerBootstrap()
   b.group(bossGroup, workerGroup)
     .channel(NioServerSocketChannel::class.java)
     .childHandler(initializer)
     .option(ChannelOption.SO_BACKLOG, 128)
     .childOption(ChannelOption.SO_KEEPALIVE, true)
-  val result = b.bind(port).sync()
-  logger.info("Server started at {}", port)
-  return result
+  return b.bind(port)
 }

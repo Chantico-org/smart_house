@@ -8,7 +8,7 @@ import java.net.Socket
 class ServerSpec : StringSpec() {
   init {
       "device into stage" {
-        val socket = Socket("localhost", 7080)
+        val socket = Socket("localhost", 8080)
         val gson = Gson()
         val output = socket.outputStream
         val deviceMetaData = DeviceMetaData(
