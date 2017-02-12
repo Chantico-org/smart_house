@@ -6,7 +6,6 @@ import org.example.myhome.device_server.DeviceServer
 import org.example.myhome.utils.syncChannel
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
-import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 
@@ -24,8 +23,7 @@ open class ApplicationContext {
 }
 
 fun main(args: Array<String>) {
-  SpringApplication.run(ApplicationContext::class.java)
-  val context = AnnotationConfigApplicationContext(ApplicationContext::class.java)
+  val context = SpringApplication.run(ApplicationContext::class.java)
   val deviceServer = context.getBean(DeviceServer::class.java)
   deviceServer.start()?.syncChannel()?.closeFuture()?.sync()
 }
