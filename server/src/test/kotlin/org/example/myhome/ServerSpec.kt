@@ -8,7 +8,7 @@ import java.net.Socket
 class ServerSpec : StringSpec() {
   init {
       "device into stage" {
-        val socket = Socket("localhost", 8080)
+        val socket = Socket("localhost", 7080)
         val gson = Gson()
         val output = socket.outputStream
         val deviceMetaData = DeviceMetaData(
@@ -17,6 +17,8 @@ class ServerSpec : StringSpec() {
           sensors = listOf(1, 2, 3),
           controls = listOf(0, 1, 3)
         )
+        output.writeJson(gson, deviceMetaData)
+//        Thread.sleep(30000)
         output.writeJson(gson, deviceMetaData)
         socket.close()
       }
