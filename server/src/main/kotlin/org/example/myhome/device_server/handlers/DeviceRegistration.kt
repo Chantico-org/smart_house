@@ -23,13 +23,11 @@ class DeviceRegistration(
         val deviceMetaData = gson.fromJson(msg, DeviceMetaData::class.java)
         logger.debug("Device Meta data: $deviceMetaData")
         val handler = DeviceInteractHandler()
+        deviceRegisterService.registerDevice(deviceMetaData, handler)
         ctx.pipeline().addLast(handler)
         ctx.pipeline().remove(this)
-        ctx.pipeline().addLast(DeviceInteractHandler())
         ctx.fireChannelRegistered()
-        handler.readMessage().addListener { pr ->
-          println("Received ${pr.get()}")
-        }
+        ctx.writeAndFlush("{\"r\": 0}")
       }
     }
   }

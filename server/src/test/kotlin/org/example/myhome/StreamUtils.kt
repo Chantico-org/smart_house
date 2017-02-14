@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import java.io.InputStream
 import java.io.OutputStream
 
-fun <T> InputStream.readJson(gson: Gson, clazz: Class<T>): T {
+fun InputStream.readString():String {
   val sizeBuffer = ByteArray(4)
   this.read(sizeBuffer)
 
@@ -17,11 +17,14 @@ fun <T> InputStream.readJson(gson: Gson, clazz: Class<T>): T {
   length = length or sizeBuffer[(sizeBuffer.size -1)].toInt()
   val buffer = ByteArray(length)
   this.read(buffer)
-  return gson.fromJson(kotlin.text.String(buffer), clazz)
+  return kotlin.text.String(buffer)
 }
 
-fun OutputStream.writeJson(gson:Gson, obj: Any) {
-  val data = gson.toJson(obj)
+fun <T> InputStream.readJson(gson: Gson, clazz: Class<T>): T {
+  return gson.fromJson(this.readString(), clazz)
+}
+
+fun OutputStream.writeString(data:String) {
   val length_buffer: ByteArray = ByteArray(4)
   var data_length = data.length
   for (i in 3 downTo 0) {
@@ -31,4 +34,9 @@ fun OutputStream.writeJson(gson:Gson, obj: Any) {
   }
   this.write(length_buffer)
   this.write(data.toByteArray())
+}
+
+fun OutputStream.writeJson(gson:Gson, obj: Any) {
+  val data = gson.toJson(obj)
+  this.writeString(data)
 }

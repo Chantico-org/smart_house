@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service
 class DeviceRegisterService {
   var devicesMetaData:Map<String, DeviceMetaData> = emptyMap()
   private var deviceChannels: Map<String, DeviceInteractHandler> = emptyMap()
-  private val logger: Logger = LoggerFactory.getLogger(javaClass)
 
   fun registerDevice(deviceMetaData: DeviceMetaData, deviceInteractHandler: DeviceInteractHandler) {
     devicesMetaData += (deviceMetaData.deviceId to deviceMetaData)

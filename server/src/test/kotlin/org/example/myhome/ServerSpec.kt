@@ -10,6 +10,7 @@ class ServerSpec : StringSpec() {
       "device into stage" {
         val socket = Socket("localhost", 7080)
         val gson = Gson()
+        val input = socket.inputStream
         val output = socket.outputStream
         val deviceMetaData = DeviceMetaData(
           deviceId = "Random String",
@@ -18,8 +19,7 @@ class ServerSpec : StringSpec() {
           controls = listOf(0, 1, 3)
         )
         output.writeJson(gson, deviceMetaData)
-//        Thread.sleep(30000)
-        output.writeJson(gson, deviceMetaData)
+        input.readString() shouldEqual "{\"r\": 0}"
         socket.close()
       }
   }

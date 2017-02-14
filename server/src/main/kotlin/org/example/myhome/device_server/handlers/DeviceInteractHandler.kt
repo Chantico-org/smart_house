@@ -1,5 +1,6 @@
 package org.example.myhome.device_server.handlers
 
+import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
 import io.netty.util.concurrent.Promise
@@ -37,5 +38,9 @@ class DeviceInteractHandler : ChannelInboundHandlerAdapter() {
       ?: throw Exception("channel is not registered yet")
     promiseQueue += promise
     return promise
+  }
+
+  fun writeMessage(data: String): ChannelFuture? {
+    return channelHandlerContext?.channel()?.writeAndFlush(data)
   }
 }
