@@ -14,6 +14,25 @@ bool useStub() {
 }
 #endif
 
+void smart::eraseConfigFile() {
+  #ifdef DEBUG_CONFIG_FILE
+  Serial.println(F("Mounting FS..."));
+  #endif
+
+  if (!SPIFFS.begin()) {
+    #ifdef DEBUG_CONFIG_FILE
+    Serial.println(F("Failed to mount file system"));
+    #endif
+    return;
+  }
+  if (SPIFFS.exists("/config.json")) {
+    #ifdef DEBUG_CONFIG_FILE
+    Serial.println(F("File exists"));
+    #endif
+    SPIFFS.remove("/config.json");
+  }
+}
+
 void smart::useConfigFile() {
   using smart::deviceState;
 
@@ -71,6 +90,12 @@ void smart::useConfigFile() {
   delete deviceState.password;
   deviceState.password = smart::allocCharP(json["pass"]);
 
+  delete deviceState.key;
+  deviceState.key = smart::allocCharP(json["key"]);
+
+  delete deviceState.serverHost;
+  deviceState.serverHost = smart::allocCharP(json["host"]);
+
   if (!smart::connectToAP()) {
     deviceState.connectionStage = CONNECTION_STAGE_SERVER;
     return;
@@ -85,6 +110,8 @@ bool smart::saveDeviceState() {
   JsonObject& json = jsonBuffer.createObject();
   json["ssid"] = deviceState.ssid;
   json["pass"] = deviceState.password;
+  json["key"] = deviceState.key;
+  json["host"] = deviceState.serverHost;
   File configFile = SPIFFS.open("/config.json", "w");
   if (!configFile) {
     #ifdef DEBUG_CONFIG_FILE

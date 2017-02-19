@@ -48,6 +48,8 @@ bool smart::connectToAP(int timeout) {
   Serial.print(F("Connecting to "));
   Serial.printf("%s [%s]\n", ssid, password);
   #endif
+  int state = LOW;
+  digitalWrite(AP_CONNECTION_PIN, state);
   while (WiFi.status() != WL_CONNECTED)
   {
     if(millis() - begin_millis > timeout) {
@@ -55,9 +57,12 @@ bool smart::connectToAP(int timeout) {
       Serial.println();
       Serial.println(F("Connection timeout"));
       #endif
+      digitalWrite(AP_CONNECTION_PIN, HIGH);
       deviceState.connectionStage = CONNECTION_STAGE_SERVER;
       return false;
     }
+    state = !state;
+    digitalWrite(AP_CONNECTION_PIN, state);
     delay(500);
     #ifdef DEBUG_COMMONS
     Serial.print(F("."));
@@ -68,6 +73,7 @@ bool smart::connectToAP(int timeout) {
   Serial.print(F("IP "));
   Serial.printf("[%s]\n", WiFi.localIP().toString().c_str());
   #endif
+  digitalWrite(AP_CONNECTION_PIN, LOW);
   deviceState.connectionStage = CONNECTION_STAGE_CONNECTED;
   return true;
 }

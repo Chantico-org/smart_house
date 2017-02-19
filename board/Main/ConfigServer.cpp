@@ -1,17 +1,7 @@
 #include "ConfigServer.h"
 
-// step 0
-// 273,581
-// 34,916
-
-// step 1
-// 273,805
-// 34,708
-
-// final
-// 273,797
-// 34,436
-
+IPAddress apIP(192, 168, 4, 1);
+IPAddress netMsk(255, 255, 255, 0);
 const String error = "{\"res\": \"Something went wrog\"}";
 const String contentType = "application/json";
 
@@ -20,7 +10,8 @@ smart::ConfigServer::ConfigServer() {
 	Serial.println(F("Creating ConfigServer"));
 	Serial.print(F("Setting soft-AP ... "));
 	#endif//debug output
-
+	WiFi.mode(WIFI_AP);
+  WiFi.softAPConfig(apIP, apIP, netMsk);
 	bool APsucess = WiFi.softAP("ESP_01");
 
 	#ifdef DEBUG_CONFIG_SERVER
@@ -36,7 +27,8 @@ smart::ConfigServer::ConfigServer() {
 		this->handleConfig();
 	});
 	server->begin();
-
+	digitalWrite(HOST_CONNECTION_PIN, HIGH);
+	digitalWrite(AP_CONNECTION_PIN, HIGH);
 	#ifdef DEBUG_CONFIG_SERVER
 	Serial.println(F("ConfigServer started"));
 	#endif//debug output
@@ -47,6 +39,8 @@ void smart::ConfigServer::handleConfig() {
 
 	String ssid = server->arg("ssid");
 	String pass = server->arg("pass");
+	String key = server->arg("key");
+	String host = server->arg("host");
 
 	#ifdef DEBUG_CONFIG_SERVER
 	Serial.println(F("Config Handle"));
@@ -56,6 +50,10 @@ void smart::ConfigServer::handleConfig() {
 	Serial.println(ssid);
 	Serial.print(F("String Password: "));
 	Serial.println(pass);
+	Serial.print(F("String Key: "));
+	Serial.println(key);
+	Serial.print(F("String host: "));
+	Serial.println(host);
 	#endif//debug output
 
 	if (!smart::isValidAP(ssid)) {
@@ -68,6 +66,12 @@ void smart::ConfigServer::handleConfig() {
 
 	delete deviceState.password;
 	deviceState.password = smart::allocCharP(pass);
+
+	delete deviceState.key;
+	deviceState.key = smart::allocCharP(key);
+
+	delete deviceState.serverHost;
+	deviceState.serverHost = smart::allocCharP(host);
 
 
 	if (!smart::connectToAP()) {
@@ -99,5 +103,5 @@ void smart::cleanConfigServer(ConfigServer*& configServer){
 		configServer = NULL;
 	}
 }
-
-// http://192.168.4.1:8080/config?ssid=TP-LINK_40393C&pass=64700240393c
+// deviceId: 1B66D01640E0
+// http://192.168.4.1:8080/config?ssid=TP-LINK_40393C&pass=64700240393c&key=4a38cae6-949c-4e0b-b7d8-e50d9f94a20e&host=192.168.0.104

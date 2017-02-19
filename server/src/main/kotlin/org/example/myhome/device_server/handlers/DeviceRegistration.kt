@@ -3,6 +3,7 @@ package org.example.myhome.device_server.handlers
 import com.google.gson.Gson
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
+import org.example.myhome.device_server.DTO.DeviceRegistrationResponse
 import org.example.myhome.models.DeviceMetaData
 import org.example.myhome.services.DeviceRegisterService
 import org.slf4j.Logger
@@ -21,13 +22,17 @@ class DeviceRegistration(
     when(msg) {
       is String -> {
         val deviceMetaData = gson.fromJson(msg, DeviceMetaData::class.java)
-        logger.debug("Device Meta data: $deviceMetaData")
+        println("Device Meta data: $deviceMetaData")
         val handler = DeviceInteractHandler()
-        deviceRegisterService.registerDevice(deviceMetaData, handler)
-        ctx.pipeline().addLast(handler)
+        val registered = deviceRegisterService.registerDevice(deviceMetaData, handler)
         ctx.pipeline().remove(this)
-        ctx.fireChannelRegistered()
-        ctx.writeAndFlush("{\"r\": 0}")
+        if (registered) {
+          ctx.pipeline().addLast(handler)
+          ctx.fireChannelRegistered()
+          ctx.writeAndFlush(gson.toJson(DeviceRegistrationResponse(0)))
+          return
+        }
+        ctx.writeAndFlush(gson.toJson(DeviceRegistrationResponse(1)))
       }
     }
   }

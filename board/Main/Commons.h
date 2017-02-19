@@ -4,7 +4,7 @@
 #define DEBUG_COMMONS
 
 #include <ESP8266WiFi.h>
-
+#include "Constants.h"
 
 #define DEFAULT_TIME_OUT 30000
 
@@ -21,6 +21,8 @@ namespace smart {
 		char connectionStage = CONNECTION_STAGE_FILE;
 		char* ssid = NULL;
 		char* password = NULL;
+		char* key = NULL;
+		char* serverHost = NULL;
 	};
 
 	extern DeviceState deviceState;

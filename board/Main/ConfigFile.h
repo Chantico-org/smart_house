@@ -3,6 +3,7 @@
 
 #include <ESP8266WiFi.h>
 #include <ArduinoJson.h>
+#include "Constants.h"
 #include "Commons.h"
 #include "FS.h"
 
@@ -11,6 +12,7 @@
 
 namespace smart {
   void useConfigFile();
+  void eraseConfigFile();
   bool saveDeviceState();
 } // smart
 

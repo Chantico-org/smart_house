@@ -6,7 +6,7 @@ import java.io.OutputStream
 
 fun InputStream.readString():String {
   val sizeBuffer = ByteArray(4)
-  this.read(sizeBuffer)
+  println(this.read(sizeBuffer))
 
   var length = 0
   for (i in 0..2) {

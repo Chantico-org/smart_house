@@ -3,6 +3,7 @@
 
 #include <ESP8266WiFi.h>
 #include <ArduinoJson.h>
+#include "Constants.h"
 #include "Commons.h"
 
 // 5 minutes
@@ -17,10 +18,12 @@ namespace smart {
     char* data_buffer;
     char* host;
     int port;
+    void writeClientLength(int data_length);
     static const int MESSAGE_LENGTH = 4;
   public:
     static const int MAX_MESSAGE_SIZE = 1024;
     Client(const char*, int);
+    bool read(char*);
     void write(JsonObject&);
     void write(char *);
     bool connect(int timeout = DEFAULT_TIMEOUT);
