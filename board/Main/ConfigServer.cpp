@@ -74,8 +74,11 @@ void smart::ConfigServer::handleConfig() {
 	delete deviceState.serverHost;
 	deviceState.serverHost = smart::allocCharP(host);
 
+	if (!smart::connectToAP()) {
+		return;
+	}
+
 	smart::saveDeviceState();
-	delay(1000);
 }
 
 smart::ConfigServer::~ConfigServer() {
@@ -100,4 +103,4 @@ void smart::cleanConfigServer(ConfigServer*& configServer){
 	}
 }
 // deviceId: 1B66D01640E0
-// http://192.168.4.1:8080/config?ssid=TP-LINK_40393C&pass=64700240393c&key=87ea9542-df16-4741-a1c7-6d905df7430b&host=192.168.0.104
+// http://192.168.4.1:8080/config?ssid=TP-LINK_40393C&pass=64700240393c&key=962518a3-6e00-41ca-8fbc-0803bef25f2b&host=192.168.0.104
