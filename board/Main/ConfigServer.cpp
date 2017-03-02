@@ -60,6 +60,7 @@ void smart::ConfigServer::handleConfig() {
 		server->send(400, contentType, error);
 		return;
 	}
+	server->send(200, contentType, "{\"res\": \"connecting\"}");
 
 	delete deviceState.ssid;
 	deviceState.ssid = smart::allocCharP(ssid);
@@ -73,13 +74,8 @@ void smart::ConfigServer::handleConfig() {
 	delete deviceState.serverHost;
 	deviceState.serverHost = smart::allocCharP(host);
 
-
-	if (!smart::connectToAP()) {
-		server->send(400, contentType, error);
-		return;
-	}
 	smart::saveDeviceState();
-	server->send(200, contentType, "{\"res\": 0}");
+	delay(1000);
 }
 
 smart::ConfigServer::~ConfigServer() {
@@ -104,4 +100,4 @@ void smart::cleanConfigServer(ConfigServer*& configServer){
 	}
 }
 // deviceId: 1B66D01640E0
-// http://192.168.4.1:8080/config?ssid=TP-LINK_40393C&pass=64700240393c&key=4a38cae6-949c-4e0b-b7d8-e50d9f94a20e&host=192.168.0.104
+// http://192.168.4.1:8080/config?ssid=TP-LINK_40393C&pass=64700240393c&key=87ea9542-df16-4741-a1c7-6d905df7430b&host=192.168.0.104

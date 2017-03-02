@@ -35,10 +35,11 @@ void setup() {
   pinMode(NORMAL_STATE_PIN, OUTPUT);
   pinMode(AP_CONNECTION_PIN, OUTPUT);
   pinMode(HOST_CONNECTION_PIN, OUTPUT);
-  pinMode(D5, OUTPUT);
+  pinMode(LIGHT_PIN, OUTPUT);
   digitalWrite(NORMAL_STATE_PIN, LOW);
   digitalWrite(AP_CONNECTION_PIN, LOW);
   digitalWrite(HOST_CONNECTION_PIN, LOW);
+  digitalWrite(LIGHT_PIN, LOW);
   smart::initId();
 }
 #endif
@@ -93,11 +94,11 @@ void loop() {
         StaticJsonBuffer<smart::Client::MAX_MESSAGE_SIZE> buffer;
         JsonObject& root = buffer.parseObject(message_buffer);
         if (root["command"] == 1) {
-          digitalWrite(D5, HIGH);
+          digitalWrite(LIGHT_PIN, HIGH);
           client->write("Ok, let's turn on light");
         }
         if (root["command"] == 2) {
-          digitalWrite(D5, LOW);
+          digitalWrite(LIGHT_PIN, LOW);
           client->write("Ok, let's turn off light");
         }
       }

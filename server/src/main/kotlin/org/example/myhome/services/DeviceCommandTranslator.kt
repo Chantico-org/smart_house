@@ -27,7 +27,6 @@ class DeviceCommandTranslator {
   }
   fun translateCommand(deviceMetaData: DeviceMetaData, commandMeta: CommandMeta): Int? {
     val majorVersion = deviceMetaData.firmwareVersion ushr 16
-    println(majorVersion)
     return dictionary[majorVersion]
       ?.get(commandMeta.controlType)
       ?.get(commandMeta.command)
