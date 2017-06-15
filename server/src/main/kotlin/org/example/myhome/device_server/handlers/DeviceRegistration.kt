@@ -1,43 +1,25 @@
 package org.example.myhome.device_server.handlers
 
-import com.google.gson.Gson
+import io.netty.channel.ChannelFutureListener
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
-import org.example.myhome.device_server.DTO.DeviceRegistrationResponse
-import org.example.myhome.models.DeviceMetaData
-import org.example.myhome.services.DeviceRegisterService
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.example.myhome.device_server.simp.SimpMessage
+import org.example.myhome.device_server.simp.SimpMessageType
 
-class DeviceRegistration(
-  val deviceRegisterService: DeviceRegisterService
-) : ChannelInboundHandlerAdapter() {
-  val gson = Gson()
-  val logger: Logger = LoggerFactory.getLogger(javaClass)
+class DeviceRegistration: ChannelInboundHandlerAdapter() {
 
   override fun channelRead(ctx: ChannelHandlerContext?, msg: Any?) {
     if (ctx == null) {
       return
     }
-    when(msg) {
-      is String -> {
-        val deviceMetaData = gson.fromJson(msg, DeviceMetaData::class.java)
-        println("Device Meta data: $deviceMetaData")
-        val handler = DeviceInteractHandler()
-        val registered = deviceRegisterService.registerDevice(deviceMetaData, handler)
-        ctx.pipeline().remove(this)
-        if (registered) {
-          ctx.pipeline().addLast(handler)
-          ctx.fireChannelRegistered()
-          ctx.writeAndFlush(gson.toJson(DeviceRegistrationResponse(0)))
-          return
-        }
-        ctx.writeAndFlush(gson.toJson(DeviceRegistrationResponse(1)))
-      }
+    if (msg is SimpMessage) {
+      println("Simp")
+      println(msg)
     }
-  }
-
-  override fun channelInactive(ctx: ChannelHandlerContext?) {
-    super.channelInactive(ctx)
+    if (msg is SimpMessage && msg.type == SimpMessageType.REQUEST) {
+      ctx.writeAndFlush(SimpMessage(type = SimpMessageType.RESPONSE, body = "OK"))
+        .addListener(ChannelFutureListener.CLOSE)
+    }
+    ctx.close()
   }
 }

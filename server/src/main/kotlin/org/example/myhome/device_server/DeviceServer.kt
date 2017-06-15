@@ -10,8 +10,8 @@ import io.netty.handler.codec.string.StringDecoder
 import io.netty.handler.codec.string.StringEncoder
 import io.netty.handler.logging.LoggingHandler
 import org.example.myhome.device_server.handlers.DeviceRegistration
+import org.example.myhome.device_server.simp.SimpCodec
 import org.example.myhome.server.startNettyServer
-import org.example.myhome.services.DeviceRegisterService
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import kotlin.reflect.jvm.internal.impl.javax.inject.Inject
@@ -25,20 +25,21 @@ open class DeviceServer (
 
   @Inject
   @Qualifier("workerGroup")
-  val workerGroup:NioEventLoopGroup,
-
-  val deviceRegisterService: DeviceRegisterService
+  val workerGroup:NioEventLoopGroup
 ) {
   open fun start(): ChannelFuture? {
     val init =object: ChannelInitializer<SocketChannel>(){
       override fun initChannel(ch: SocketChannel?) {
         ch?.pipeline()?.addLast(
+          LoggingHandler(),
+//          decoders
           LengthFieldBasedFrameDecoder(Int.MAX_VALUE, 0, 4, 0, 4),
           StringDecoder(),
+//          encoders
           LengthFieldPrepender(4),
           StringEncoder(),
-          DeviceRegistration(deviceRegisterService),
-          LoggingHandler()
+          SimpCodec(),
+          DeviceRegistration()
         )
       }
     }

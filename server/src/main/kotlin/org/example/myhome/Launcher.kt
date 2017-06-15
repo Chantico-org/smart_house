@@ -16,14 +16,12 @@ open class ApplicationContext {
   open fun eventBus():EventBus = EventBus()
 
   @Bean("bossGroup")
-  open fun bossGroup():NioEventLoopGroup = NioEventLoopGroup()
+  open fun bossGroup(): NioEventLoopGroup = NioEventLoopGroup()
 
   @Bean("workerGroup")
   open fun workerGroup(): NioEventLoopGroup = NioEventLoopGroup()
 }
 
 fun main(args: Array<String>) {
-  val context = SpringApplication.run(ApplicationContext::class.java)
-  val deviceServer = context.getBean(DeviceServer::class.java)
-  deviceServer.start()?.syncChannel()?.closeFuture()?.sync()
+  SpringApplication.run(ApplicationContext::class.java)
 }
