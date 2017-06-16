@@ -61,6 +61,7 @@ class ServerSpec {
       "id" to id,
       "body" to "My cool body"
     ), SimpMessageType.RESPONSE)
+
     socket.close()
   }
 }
