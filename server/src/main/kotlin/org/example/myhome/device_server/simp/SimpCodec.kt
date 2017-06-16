@@ -14,6 +14,7 @@ class SimpCodec: MessageToMessageCodec<String, SimpMessage>() {
   }
 
   override fun encode(ctx: ChannelHandlerContext?, msg: SimpMessage?, out: MutableList<Any>?) {
+    println("Encoding")
     if (msg == null || out == null) return
     val text = msg.type.toByteString() + msg.body
     out.add(text)

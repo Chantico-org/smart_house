@@ -2,7 +2,9 @@ package org.example.myhome
 
 import com.google.gson.Gson
 import org.example.myhome.device_server.simp.SimpMessage
+import org.example.myhome.device_server.simp.SimpMessageType
 import org.example.myhome.device_server.simp.inferTypeFromByte
+import org.example.myhome.device_server.simp.toInt
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -35,7 +37,7 @@ fun <T> InputStream.readJson(gson: Gson, clazz: Class<T>): T {
   return gson.fromJson(this.readString(), clazz)
 }
 
-fun OutputStream.writeString(data:String, type: Int) {
+fun OutputStream.writeString(data:String, type: SimpMessageType) {
   val length_buffer: ByteArray = ByteArray(4)
   var data_length = data.length + 1
   for (i in 3 downTo 0) {
@@ -44,11 +46,11 @@ fun OutputStream.writeString(data:String, type: Int) {
     data_length = data_length shr 8
   }
   this.write(length_buffer)
-  this.write(type)
+  this.write(type.toInt())
   this.write(data.toByteArray())
 }
 
-fun OutputStream.writeJson(gson:Gson, obj: Any, type: Int) {
+fun OutputStream.writeJson(gson:Gson, obj: Any, type: SimpMessageType) {
   val data = gson.toJson(obj)
   this.writeString(data, type)
 }

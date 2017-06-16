@@ -34,11 +34,11 @@ class DeviceRegisterService {
 
   fun sendToDevice(deviceId: String, data: String): ChannelFuture? {
     logger.debug { "Send to device: $deviceId data: $data" }
-    return deviceChannels[deviceId]?.writeMessage(data)
+    return deviceChannels[deviceId]?.channelHandlerContext?.writeAndFlush(data)
   }
 
   fun readFromDevice(deviceId: String): Promise<String>? {
     logger.debug { "Read from device[$deviceId]" }
-    return deviceChannels[deviceId]?.readMessage()
+    return deviceChannels[deviceId]?.channelHandlerContext?.executor()?.newPromise<String>()
   }
 }

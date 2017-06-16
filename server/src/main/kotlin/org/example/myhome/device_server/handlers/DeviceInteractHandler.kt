@@ -1,14 +1,26 @@
 package org.example.myhome.device_server.handlers
 
-import io.netty.channel.ChannelFuture
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
-import io.netty.util.concurrent.Promise
-import org.example.myhome.exceptions.DeviceChannelClosed
+import org.example.myhome.device_server.simp.SimpMessage
+import org.example.myhome.device_server.simp.SimpMessageType
+import org.example.myhome.extension.logger
+import reactor.core.publisher.Flux
+import reactor.core.publisher.FluxSink
+import reactor.core.publisher.Mono
+import reactor.core.publisher.MonoSink
+import reactor.core.scheduler.Schedulers
 
 class DeviceInteractHandler : ChannelInboundHandlerAdapter() {
+  companion object {
+    val log by logger()
+    val objectMapper = ObjectMapper()
+  }
+  var currentCorrelationId = Int.MIN_VALUE
   var channelHandlerContext: ChannelHandlerContext? = null
-  var promiseQueue:List<Promise<String>> = emptyList()
+  var senderMap = emptyMap<Int, MonoSink<String>>()
+  var subscriptionMap = emptyMap<String, FluxSink<String>>()
 
   override fun channelRegistered(ctx: ChannelHandlerContext?) {
     channelHandlerContext = ctx
@@ -16,43 +28,68 @@ class DeviceInteractHandler : ChannelInboundHandlerAdapter() {
   }
 
   override fun channelRead(ctx: ChannelHandlerContext?, msg: Any?) {
-    when(msg) {
-      is String -> {
-        val promise = promiseQueue.firstOrNull()
-        if (promise == null) {
-          super.channelRead(ctx, msg)
-          return
-        }
-        promise.setSuccess(msg)
-        promiseQueue = promiseQueue.drop(1)
+    if (msg !is SimpMessage) return
+    val config = objectMapper.readTree(msg.body)
+    when (msg.type) {
+      SimpMessageType.MESSAGE -> {
+        val topic = config["topic"]
+          ?.asText()
+          ?: ""
+        val body = config["body"]
+          ?.asText()
+          ?: ""
+        subscriptionMap[topic]?.next(body)
+      }
+      SimpMessageType.RESPONSE -> {
+        val body = config["body"]
+          ?.asText()
+          ?: ""
+        val correlationId = config["id"]
+          ?.asInt()
+          ?: 0
+        println("$$$$#$$$$$$#")
+        println("$$$$#$$$$$$#")
+        println("$$$$#$$$$$$#")
+        println(correlationId)
+        println(senderMap)
+        senderMap[correlationId]?.success(body)
       }
       else -> {
-        super.channelRead(ctx, msg)
+        log.error("Unknown message type ${msg.type}")
       }
     }
   }
 
-  override fun exceptionCaught(ctx: ChannelHandlerContext?, cause: Throwable?) {
-    println("promise queue length: ${promiseQueue.size}")
-    promiseQueue.forEach { it.setFailure(cause) }
-    promiseQueue = emptyList()
+  fun subscribe(destination: String): Flux<String> {
+    return Flux.create {
+      sink: FluxSink<String> ->
+      subscriptionMap += destination to sink
+      val message = SimpMessage(
+        type = SimpMessageType.SUBSCRIBE,
+        body = destination
+      )
+      channelHandlerContext
+        ?.writeAndFlush(message)
+
+    }.publishOn(Schedulers.elastic())
   }
 
-  override fun channelInactive(ctx: ChannelHandlerContext?) {
-    println("Channel inactive")
-    promiseQueue.forEach { it.setFailure(DeviceChannelClosed("Device channel closed externally")) }
-    promiseQueue = emptyList()
-  }
-
-  fun readMessage(): Promise<String> {
-//    TODO create custom Exception
-    val promise = channelHandlerContext?.executor()?.newPromise<String>()
-      ?: throw Exception("channel is not registered yet")
-    promiseQueue += promise
-    return promise
-  }
-
-  fun writeMessage(data: String): ChannelFuture? {
-    return channelHandlerContext?.channel()?.writeAndFlush(data)
+  fun send(destination: String, body: String): Mono<String> {
+    return Mono.create {
+      sink: MonoSink<String> ->
+      val correlationId = currentCorrelationId++
+      val node = objectMapper.createObjectNode()
+      node.put("destination", destination)
+      node.put("id", correlationId)
+      node.put("body", body)
+      val message = SimpMessage(
+        type = SimpMessageType.REQUEST,
+        body = node.toString()
+      )
+      senderMap += correlationId to sink
+      println(message)
+      channelHandlerContext
+        ?.writeAndFlush(message)
+    }.publishOn(Schedulers.elastic())
   }
 }

@@ -12,19 +12,19 @@ import io.netty.handler.logging.LoggingHandler
 import org.example.myhome.device_server.handlers.DeviceRegistration
 import org.example.myhome.device_server.simp.SimpCodec
 import org.example.myhome.server.startNettyServer
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
-import kotlin.reflect.jvm.internal.impl.javax.inject.Inject
 
 
 @Component
 open class DeviceServer (
-  @Inject
   @Qualifier("bossGroup")
+  @Autowired
   val bossGroup:NioEventLoopGroup,
 
-  @Inject
   @Qualifier("workerGroup")
+  @Autowired
   val workerGroup:NioEventLoopGroup
 ) {
   open fun start(): ChannelFuture? {
