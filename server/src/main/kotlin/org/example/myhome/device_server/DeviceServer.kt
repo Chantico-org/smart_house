@@ -39,7 +39,7 @@ open class DeviceServer (
           LengthFieldPrepender(4),
           StringEncoder(),
           SimpCodec(),
-          DeviceRegistration()
+          LoggingHandler()
         )
       }
     }

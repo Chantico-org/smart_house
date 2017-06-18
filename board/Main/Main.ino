@@ -5,6 +5,13 @@
 #include "ConfigFile.h"
 #include "Client.h"
 #include "FS.h"
+#include <string>
+#include<forward_list>
+
+#define TEST
+
+std::forward_list<int> flist1 = {1,2,3};
+std::string amt = "Hello world";
 
 smart::ConfigServer *configServer = NULL;
 smart::Client *client = NULL;
@@ -21,7 +28,22 @@ void clientModeState() {
 }
 
 #ifdef TEST
-void setup() {}
+void setup() {
+  for(int& a: flist1) {
+    Serial.println(a);
+  }
+  delay(5000);
+  Serial.begin(115200);
+  Serial.println();
+  Serial.println();
+  Serial.println(F("Setuping..."));
+}
+void loop() {
+  delay(1000);
+  Serial.println(F("Lap 1"));
+  delay(1000);
+  Serial.println(F("Lap 2"));
+}
 #else
 void setup() {
   Serial.begin(115200);
@@ -42,12 +64,9 @@ void setup() {
   digitalWrite(LIGHT_PIN, LOW);
   smart::initId();
 }
-#endif
-#ifdef TEST
-void loop() {}
-#else
+
 void loop() {
-	using smart::deviceState;
+  using smart::deviceState;
   switch(deviceState.connectionStage) {
     case CONNECTION_STAGE_FILE:
       smart::useConfigFile();
