@@ -7,8 +7,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
-#include <ArduinoJson.h>
-// #include "sample.h"
 #include <SimpClient.h>
 
 using namespace std;
@@ -19,9 +17,9 @@ void error(char *msg) {
   exit(0);
 }
 
-class LinuxTcpClient: public simp::Client {
+class LinuxTcpClient{
 private:
-	int sockfd;
+	int sockfd = -1;
 	int portno = 7080;
 	struct sockaddr_in serveraddr;
 	struct hostent *server;
@@ -60,10 +58,7 @@ public:
 	}
 
   size_t write(uint8_t byte) {
-		uint8_t* buffer = new uint8_t[1];
-		buffer[0] = byte;
-		write(buffer, 1);
-		delete[] buffer;
+		return write(&byte, 1);
 	}
 
 	~LinuxTcpClient() {
@@ -72,12 +67,10 @@ public:
 	}
 };
 
+typedef simp::SimpClient<LinuxTcpClient> SimpClient;
+
 int main() {
-	uint8_t byte = 0;
-	simp::SimpMessageType type = simp::infereFromByte(byte);
-	std::cout << (simp::SimpMessageType::SUBSCRIBE == type) << '\n';
-	std::cout << (simp::convertToByte(simp::SimpMessageType::SUBSCRIBE)) << '\n';
-	simp::SimpClient* client = new simp::SimpClient(new LinuxTcpClient());
+	SimpClient* client = new SimpClient(new LinuxTcpClient());
 	for (size_t i = 0; i < 10; i++) {
 		client->loop();
 	}

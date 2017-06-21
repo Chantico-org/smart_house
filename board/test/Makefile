@@ -1,8 +1,8 @@
 CC=g++
-ARDUINO_JSON_PATH=/root/Arduino/libraries/ArduinoJson
+ARDUINO_JSON_PATH=/home/alexei/temp/ArduinoJson
 MAIN_PATH = $(PWD)/../Main
-SRC = test.cpp #$(PWD)/../Main/SimpClient.cpp test.cpp
+C_FLAGS = -I $(ARDUINO_JSON_PATH) -I $(MAIN_PATH) -D DESKTOP
 
 run:
-	$(CC) -I $(ARDUINO_JSON_PATH) -I $(MAIN_PATH) $(SRC) -o test
-	./test
+	$(CC) $(C_FLAGS) test.cpp -o test.bin
+	./test.bin
