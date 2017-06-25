@@ -9,6 +9,7 @@ import io.netty.handler.codec.LengthFieldPrepender
 import io.netty.handler.codec.string.StringDecoder
 import io.netty.handler.codec.string.StringEncoder
 import io.netty.handler.logging.LoggingHandler
+import org.example.myhome.device_server.handlers.DeviceRegistration
 import org.example.myhome.device_server.simp.SimpCodec
 import org.example.myhome.server.startNettyServer
 import org.springframework.beans.factory.annotation.Autowired
@@ -38,7 +39,7 @@ open class DeviceServer (
           LengthFieldPrepender(4),
           StringEncoder(),
           SimpCodec(),
-          LoggingHandler()
+          DeviceRegistration()
         )
       }
     }

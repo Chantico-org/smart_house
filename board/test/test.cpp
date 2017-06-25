@@ -5,10 +5,13 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <SimpClient.h>
 
+using namespace simp;
 using namespace std;
 
 void error(char *msg) {
@@ -43,15 +46,28 @@ public:
 		bcopy((char *)server->h_addr,
 			(char *)&serveraddr.sin_addr.s_addr, server->h_length);
 		serveraddr.sin_port = htons(portno);
-
 		if (::connect(sockfd, (struct sockaddr *)&serveraddr, sizeof(serveraddr)) < 0)
 			error("ERROR connecting");
-
 		__connected = 1;
 	}
  	uint8_t connected() {return __connected;}
   uint8_t read() {return 0;}
-  size_t read(uint8_t *buf, size_t size) {return 0;}
+  size_t read(uint8_t *buf, size_t size) {
+    return ::recv(sockfd, buf, size, 0);
+  }
+
+  int available() {
+    fd_set fd;
+    struct timeval tv;
+    tv.tv_sec = 0;
+    tv.tv_usec = 1;
+    FD_ZERO(&fd);
+    FD_SET(sockfd, &fd);
+    if (select(sockfd + 1, &fd, NULL, NULL, &tv) < 0) {
+      error("Socket select");
+    }
+    return FD_ISSET(sockfd, &fd);
+  }
 
 	size_t write(const uint8_t *buf, size_t size) {
 		return ::write(sockfd, buf, size);
@@ -63,16 +79,29 @@ public:
 
 	~LinuxTcpClient() {
 		cout << "Closing.." << endl;
-		close(sockfd);
+		if (connected()) {
+  		close(sockfd);
+		}
 	}
 };
 
-typedef simp::SimpClient<LinuxTcpClient> SimpClient;
+typedef SimpClient<LinuxTcpClient> MyClient;
+
+char *response = "OK";
+
+uint8_t* handleCommand(uint8_t* inBoundBuffer) {
+  cout << "In handle: " << inBoundBuffer << endl;
+  return (uint8_t*) response;
+}
 
 int main() {
-	SimpClient* client = new SimpClient(new LinuxTcpClient());
-	for (size_t i = 0; i < 10; i++) {
+	MyClient* client = new MyClient(new LinuxTcpClient());
+	client->onRequest("control/1", handleCommand);
+	string a = "OK";
+	string b = response;
+	while(true) {
 		client->loop();
+		sleep(1);
 	}
 	delete client;
 	return 0;
