@@ -1,17 +1,5 @@
 #include "RequestHandler.h"
 
-#ifdef DESKTOP
-
-#include <iostream>
-#include <stdio.h>
-#include <unistd.h>
-
-#define PRINTLN(line) cout << line << endl
-
-#else
-#define PRINTLN(line)
-#endif
-
 using namespace simp;
 using namespace std;
 
@@ -21,7 +9,8 @@ RequestHandler::RequestHandler(string destination, TRequestHandler handler){
 }
 
 bool RequestHandler::canHandle(JsonObject& request) {
-  return destination == request["destination"];
+//  return (destination == request["destination"]);
+  return true;
 }
 
 void RequestHandler::handle(JsonObject& request) {

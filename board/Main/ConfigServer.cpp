@@ -103,4 +103,4 @@ void smart::cleanConfigServer(ConfigServer*& configServer){
 	}
 }
 // deviceId: 1B66D01640E0
-// http://192.168.4.1:8080/config?ssid=FiOS-IHES3&pass=cap465raw4166image&key=69346e5b-6f42-4655-a87c-da29bf155a47&host=10.2.3.53
+// http://192.168.4.1:8080/config?ssid=TP-LINK_40393c&pass=64700240393c&key=69346e5b-6f42-4655-a87c-da29bf155a47&host=10.2.3.53

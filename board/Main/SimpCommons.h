@@ -3,8 +3,29 @@
 
 #include <functional>
 
+#ifdef DESKTOP
+
+#include <iostream>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/time.h>
+
+#define PRINTLN(line) cout << line << endl
+
+void delay(int period);
+unsigned long millis();
+
+#else
+
+#include <Arduino.h>
+
+#define PRINTLN(line)
+
+#endif
+
 namespace simp {
   typedef std::function<uint8_t*(uint8_t*)> TRequestHandler;
+  typedef std::function<uint8_t*()> TResourceHandler;
 
   enum SimpMessageType {
     SUBSCRIBE,

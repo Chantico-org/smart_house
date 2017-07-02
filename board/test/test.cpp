@@ -51,7 +51,6 @@ public:
 		__connected = 1;
 	}
  	uint8_t connected() {return __connected;}
-  uint8_t read() {return 0;}
   size_t read(uint8_t *buf, size_t size) {
     return ::recv(sockfd, buf, size, 0);
   }
@@ -94,11 +93,14 @@ uint8_t* handleCommand(uint8_t* inBoundBuffer) {
   return (uint8_t*) response;
 }
 
+uint8_t* sendTemparature() {
+	return (uint8_t*) response;
+}
+
 int main() {
 	MyClient* client = new MyClient(new LinuxTcpClient());
-	client->onRequest("control/1", handleCommand);
-	string a = "OK";
-	string b = response;
+	client->onRequest("/control/1", handleCommand);
+	client->onResourse("/temperature", 10000, sendTemparature);
 	while(true) {
 		client->loop();
 		sleep(1);

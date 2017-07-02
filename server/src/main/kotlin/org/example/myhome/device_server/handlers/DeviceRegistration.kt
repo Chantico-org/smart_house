@@ -28,9 +28,14 @@ class DeviceRegistration: ChannelInboundHandlerAdapter() {
       log.debug("Config: $config")
       ctx.channel().eventLoop().schedule({
         ctx.writeAndFlush(SimpMessage(type = SimpMessageType.RESPONSE, body = "OK"))
-        handler.send("control/1", "")
+        handler.send("/control/1", "")
           .doOnNext {
             log.debug(it)
+          }
+          .subscribe()
+        handler.subscribe("/temperature")
+          .doOnNext {
+            log.debug("Subscribe message: $it")
           }
           .subscribe()
       }, 1, TimeUnit.SECONDS)

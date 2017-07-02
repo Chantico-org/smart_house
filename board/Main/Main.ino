@@ -3,19 +3,14 @@
 #include "Commons.h"
 #include "ConfigServer.h"
 #include "ConfigFile.h"
-#include "Client.h"
 #include "FS.h"
+#include "Client.h"
 #include <string>
-#include<forward_list>
+#include "SimpClient.h"
 
-#define TEST
-
-std::forward_list<int> flist1 = {1,2,3};
-std::string amt = "Hello world";
+simp::SimpClient<smart::Client>* client;
 
 smart::ConfigServer *configServer = NULL;
-smart::Client *client = NULL;
-char *message_buffer = new char[smart::Client::MAX_MESSAGE_SIZE];
 
 void restartClick() {
   Serial.println("Restart click");
@@ -27,12 +22,21 @@ void clientModeState() {
   WiFi.mode(WIFI_STA);
 }
 
+char* response = "OK";
+
+uint8_t* turnOnLight(uint8_t* request) {
+  digitalWrite(LIGHT_PIN, HIGH);
+  return (uint8_t*)response;
+}
+
+void setupClient() {
+  using smart::deviceState;
+  client = new simp::SimpClient<smart::Client>(new smart::Client(deviceState.serverHost));
+  client->onRequest("/control/1", turnOnLight);
+}
+
 #ifdef TEST
 void setup() {
-  for(int& a: flist1) {
-    Serial.println(a);
-  }
-  delay(5000);
   Serial.begin(115200);
   Serial.println();
   Serial.println();
@@ -73,6 +77,7 @@ void loop() {
       if (deviceState.connectionStage == CONNECTION_STAGE_CONNECTED) {
         digitalWrite(NORMAL_STATE_PIN, HIGH);
         clientModeState();
+        setupClient();
       }
       break;
     case CONNECTION_STAGE_SERVER:
@@ -81,46 +86,13 @@ void loop() {
         smart::cleanConfigServer(configServer);
         digitalWrite(NORMAL_STATE_PIN, HIGH);
         clientModeState();
+        setupClient();
       }
       break;
     case CONNECTION_STAGE_CONNECTED:
-      if (client == NULL) {
-        client = new smart::Client(deviceState.serverHost, SERVER_PORT);
-        bool connected = client->connect();
-        while(!connected) {
-          delay(1000);
-          connected = client->connect();
-        }
-        StaticJsonBuffer<smart::Client::MAX_MESSAGE_SIZE> buffer;
-        JsonObject& root = buffer.createObject();
-        root["deviceId"] = deviceState.deviceId;
-        root["deviceKey"] = deviceState.key;
-        root["firmwareVersion"] = FIRMWARE_VERSION;
-        root.createNestedArray("sensors");
-        root.createNestedArray("controls");
-        client->write(root);
-        bool received = client->read(message_buffer);
-        while(!received) {
-          delay(1000);
-          Serial.println("Waiting for message");
-          received = client->read(message_buffer);
-        }
-        Serial.printf("Received: %s\n", message_buffer);
-      }
-      if (client->read(message_buffer)) {
-        Serial.println(F("Received a message: "));
-        Serial.println(message_buffer);
-        StaticJsonBuffer<smart::Client::MAX_MESSAGE_SIZE> buffer;
-        JsonObject& root = buffer.parseObject(message_buffer);
-        if (root["command"] == 1) {
-          digitalWrite(LIGHT_PIN, HIGH);
-          client->write("Ok, let's turn on light");
-        }
-        if (root["command"] == 2) {
-          digitalWrite(LIGHT_PIN, LOW);
-          client->write("Ok, let's turn off light");
-        }
-      }
+//    TODO reconnect to AP
+      Serial.println("CONNECTED");
+      client->loop();
       digitalWrite(NORMAL_STATE_PIN, HIGH);
       delay(1000);
       digitalWrite(NORMAL_STATE_PIN, LOW);

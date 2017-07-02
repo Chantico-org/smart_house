@@ -5,6 +5,7 @@
 #include <string.h>
 #include <functional>
 #include <ArduinoJson.h>
+#include <ESP8266WiFi.h>
 
 using namespace std;
 using namespace simp;

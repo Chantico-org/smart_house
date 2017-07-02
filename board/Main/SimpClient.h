@@ -7,6 +7,7 @@
 #include <ArduinoJson.h>
 #include "SimpCommons.h"
 #include "RequestHandler.h"
+#include "ResourceHandler.h"
 
 using namespace std;
 
@@ -22,12 +23,18 @@ namespace simp {
     uint8_t* lengthBuffer;
     size_t pendingBytes = 0;
     forward_list<RequestHandler*>* requestHandlers;
+    forward_list<ResourceHandler*>* resourceHandlers;
     SimpMessage *inBoundMessage, *outBoundMessage;
     void writeLength(uint32_t dataLength);
     void write(const uint8_t *buf, size_t size);
     void write(uint8_t byte);
+    void handleRequest(JsonObject&);
+    void handleSubscribe(JsonObject&);
+    void handleUnSubscribe(JsonObject&);
+    void handleResources();
     static const int MESSAGE_LENGTH = 4;
   public:
+    void onResourse(string, int, TResourceHandler);
     void onRequest(string, TRequestHandler);
     static const int MAX_MESSAGE_SIZE = 1024;
     SimpClient(T* client);
@@ -38,6 +45,6 @@ namespace simp {
   };
 } /* simp */
 
-#include "SimpClient.cpp"
+#include "temp/SimpClient.cpp"
 
 #endif

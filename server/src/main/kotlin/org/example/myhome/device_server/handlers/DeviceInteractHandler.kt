@@ -66,7 +66,7 @@ class DeviceInteractHandler : ChannelInboundHandlerAdapter() {
       subscriptionMap += destination to sink
       val message = SimpMessage(
         type = SimpMessageType.SUBSCRIBE,
-        body = destination
+        body = "{\"destination\":\"$destination\"}"
       )
       channelHandlerContext
         ?.writeAndFlush(message)

@@ -11,7 +11,8 @@ import java.util.*
 class ServerSpec {
   @Test
   fun testRegistration() {
-    val socket = Socket("localhost", 7080)
+    val socket = Socket("192.168.0.104", 7080)
+    println(socket.isConnected)
     val gson = Gson()
     val input = socket.inputStream
     val output = socket.outputStream
