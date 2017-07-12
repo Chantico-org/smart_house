@@ -16,6 +16,6 @@ include 'api'
 include 'services:webservice'
 */
 
-rootProject.name = 'smart'
+rootProject.name = 'smart_house'
 
 include ':server'

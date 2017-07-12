@@ -6,6 +6,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter
 import org.example.myhome.device_server.simp.SimpMessage
 import org.example.myhome.device_server.simp.SimpMessageType
 import org.example.myhome.extension.logger
+import org.example.myhome.utils.objectMapper
 import reactor.core.publisher.Flux
 import reactor.core.publisher.FluxSink
 import reactor.core.publisher.Mono
@@ -15,7 +16,6 @@ import reactor.core.scheduler.Schedulers
 class DeviceInteractHandler : ChannelInboundHandlerAdapter() {
   companion object {
     val log by logger()
-    val objectMapper = ObjectMapper()
   }
   var currentCorrelationId = Int.MIN_VALUE
   var channelHandlerContext: ChannelHandlerContext? = null

@@ -20,11 +20,9 @@ import org.springframework.stereotype.Component
 @Component
 open class DeviceServer (
   @Qualifier("bossGroup")
-  @Autowired
   val bossGroup:NioEventLoopGroup,
 
   @Qualifier("workerGroup")
-  @Autowired
   val workerGroup:NioEventLoopGroup
 ) {
   open fun start(): ChannelFuture? {
