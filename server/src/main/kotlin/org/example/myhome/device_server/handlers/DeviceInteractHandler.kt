@@ -1,6 +1,5 @@
 package org.example.myhome.device_server.handlers
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
 import org.example.myhome.device_server.simp.SimpMessage
@@ -47,11 +46,6 @@ class DeviceInteractHandler : ChannelInboundHandlerAdapter() {
         val correlationId = config["id"]
           ?.asInt()
           ?: 0
-        println("$$$$#$$$$$$#")
-        println("$$$$#$$$$$$#")
-        println("$$$$#$$$$$$#")
-        println(correlationId)
-        println(senderMap)
         senderMap[correlationId]?.success(body)
       }
       else -> {
@@ -87,7 +81,6 @@ class DeviceInteractHandler : ChannelInboundHandlerAdapter() {
         body = node.toString()
       )
       senderMap += correlationId to sink
-      println(message)
       channelHandlerContext
         ?.writeAndFlush(message)
     }.publishOn(Schedulers.elastic())
