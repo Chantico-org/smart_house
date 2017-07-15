@@ -23,16 +23,22 @@ void clientModeState() {
 }
 
 char* response = "OK";
+char* wrong = "NO";
 
-uint8_t* turnOnLight(uint8_t* request) {
-  digitalWrite(LIGHT_PIN, HIGH);
+uint8_t* changeLight(uint8_t* request) {
+  size_t length = strlen((char*) request);
+  if (length != 1) {
+    return (uint8_t*) wrong;
+  }
+  int state = request[0] - 48;
+  digitalWrite(LIGHT_PIN, state);
   return (uint8_t*)response;
 }
 
 void setupClient() {
   using smart::deviceState;
   client = new simp::SimpClient<smart::Client>(new smart::Client(deviceState.serverHost));
-  client->onRequest("/control/1", turnOnLight);
+  client->onRequest("/control/1", changeLight);
 }
 
 #ifdef TEST

@@ -1,16 +1,11 @@
 package org.example.myhome.client_controllers
 
 import com.google.gson.Gson
-import io.netty.util.concurrent.Promise
-import org.example.myhome.exceptions.DeviceNotFound
-import org.example.myhome.models.CommandMeta
-import org.example.myhome.models.DeviceMetaData
+import org.example.myhome.extension.logger
 import org.example.myhome.services.DeviceCommandTranslator
 import org.example.myhome.services.DeviceRegisterService
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import java.time.Duration
 
 data class KeyGenResponse(
   val deviceId: String,
@@ -23,39 +18,40 @@ data class KeyGenRequest(
 
 @RestController
 class DeviceKeyGenController(
-  val deviceRegisterService: DeviceRegisterService,
-  val deviceCommandTranslator: DeviceCommandTranslator
+  val deviceRegisterService: DeviceRegisterService
 ) {
   companion object{
     val gson = Gson()
+    val log by logger()
   }
+  @GetMapping("/ping")
+  fun ping() = "Test"
+
   @PostMapping("/key_gen")
   fun generateKey(
     @RequestBody body: String
   ): KeyGenResponse {
+    log.debug("Key gen: $body")
     val request = gson.fromJson(body, KeyGenRequest::class.java)
     val deviceKey = deviceRegisterService.generateKey(request.deviceId)
+
     return KeyGenResponse(
       deviceId = request.deviceId,
       deviceKey = deviceKey
     )
   }
 
-  @PostMapping("/command/{deviceId}")
+  @PostMapping("/command/{deviceId}/{state}")
   fun sendCommand(
     @PathVariable("deviceId") deviceId: String,
-    @RequestBody body:String
+    @PathVariable("state") state: String
   ): Map<String, String?> {
-    println(body)
-    val commandMeta = gson.fromJson(body, CommandMeta::class.java)
-    println("Parsed command meta: $commandMeta")
-    val promise: Promise<String>? = deviceRegisterService.readFromDevice(deviceId)
-    println("TEMP: Devices meta: ${deviceRegisterService.devicesMetaData}")
-    val deviceMetaData: DeviceMetaData = deviceRegisterService.devicesMetaData[deviceId]
-      ?: throw DeviceNotFound("Can't find device $deviceId")
-    val command = deviceCommandTranslator.translateCommand(deviceMetaData = deviceMetaData, commandMeta = commandMeta)
-    deviceRegisterService.sendToDevice(deviceId, gson.toJson(mapOf("command" to command)))?.sync()
-    val result = promise?.sync()?.get()
-    return mapOf("res" to result)
+    println(state)
+    val response = deviceRegisterService
+      .sendToDevice(deviceId, "/control/1", state)
+      .block(Duration.ofSeconds(30))
+    return mapOf(
+      "response" to response
+    )
   }
 }

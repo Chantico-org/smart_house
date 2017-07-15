@@ -9,9 +9,9 @@
 #include <sys/ioctl.h>
 #include <netinet/in.h>
 #include <netdb.h>
-#include <SimpClient.h>
+//#include <SimpClient.h>
 
-using namespace simp;
+//using namespace simp;
 using namespace std;
 
 void error(char *msg) {
@@ -84,7 +84,7 @@ public:
 	}
 };
 
-typedef SimpClient<LinuxTcpClient> MyClient;
+//typedef SimpClient<LinuxTcpClient> MyClient;
 
 char *response = "OK";
 
@@ -98,13 +98,19 @@ uint8_t* sendTemparature() {
 }
 
 int main() {
-	MyClient* client = new MyClient(new LinuxTcpClient());
-	client->onRequest("/control/1", handleCommand);
-	client->onResourse("/temperature", 10000, sendTemparature);
-	while(true) {
-		client->loop();
-		sleep(1);
-	}
-	delete client;
+  char* t = "1";
+  uint8_t* temp = (uint8_t*)t;
+  if (temp[0] == 1) {
+    cout << "ok" << endl;
+  }
+  cout << ((int)temp[0]) << endl;
+//	MyClient* client = new MyClient(new LinuxTcpClient());
+//	client->onRequest("/control/1", handleCommand);
+//	client->onResourse("/temperature", 10000, sendTemparature);
+//	while(true) {
+//		client->loop();
+//		sleep(1);
+//	}
+//	delete client;
 	return 0;
 }

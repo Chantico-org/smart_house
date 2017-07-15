@@ -103,4 +103,4 @@ void smart::cleanConfigServer(ConfigServer*& configServer){
 	}
 }
 // deviceId: 1B66D01640E0
-// http://192.168.4.1:8080/config?ssid=TP-LINK_40393c&pass=64700240393c&key=69346e5b-6f42-4655-a87c-da29bf155a47&host=10.2.3.53
+// http://192.168.4.1:8080/config?ssid=TP-LINK_40393C&pass=64700240393c&key=f4d749cb-58e0-4cf8-a0d4-45dce15669ad&host=192.168.0.104

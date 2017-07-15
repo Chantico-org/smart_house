@@ -16,10 +16,10 @@ class DeviceInteractHandler : ChannelInboundHandlerAdapter() {
   companion object {
     val log by logger()
   }
-  var currentCorrelationId = Int.MIN_VALUE
-  var channelHandlerContext: ChannelHandlerContext? = null
-  var senderMap = emptyMap<Int, MonoSink<String>>()
-  var subscriptionMap = emptyMap<String, FluxSink<String>>()
+  private var currentCorrelationId = Int.MIN_VALUE
+  private var channelHandlerContext: ChannelHandlerContext? = null
+  private var senderMap = emptyMap<Int, MonoSink<String>>()
+  private var subscriptionMap = emptyMap<String, FluxSink<String>>()
 
   override fun channelRegistered(ctx: ChannelHandlerContext?) {
     channelHandlerContext = ctx
@@ -65,13 +65,17 @@ class DeviceInteractHandler : ChannelInboundHandlerAdapter() {
       channelHandlerContext
         ?.writeAndFlush(message)
 
-    }.publishOn(Schedulers.elastic())
+    }
+      .doFinally {
+        subscriptionMap -= destination
+      }
+      .publishOn(Schedulers.elastic())
   }
 
   fun send(destination: String, body: String): Mono<String> {
+    val correlationId = currentCorrelationId++
     return Mono.create {
       sink: MonoSink<String> ->
-      val correlationId = currentCorrelationId++
       val node = objectMapper.createObjectNode()
       node.put("destination", destination)
       node.put("id", correlationId)
@@ -83,6 +87,10 @@ class DeviceInteractHandler : ChannelInboundHandlerAdapter() {
       senderMap += correlationId to sink
       channelHandlerContext
         ?.writeAndFlush(message)
-    }.publishOn(Schedulers.elastic())
+    }
+      .doFinally {
+        senderMap -= correlationId
+      }
+      .publishOn(Schedulers.elastic())
   }
 }
