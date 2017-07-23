@@ -17,13 +17,18 @@ class DeviceInteractHandler : ChannelInboundHandlerAdapter() {
     val log by logger()
   }
   private var currentCorrelationId = Int.MIN_VALUE
-  private var channelHandlerContext: ChannelHandlerContext? = null
+  var channelHandlerContext: ChannelHandlerContext? = null
   private var senderMap = emptyMap<Int, MonoSink<String>>()
   private var subscriptionMap = emptyMap<String, FluxSink<String>>()
 
   override fun channelRegistered(ctx: ChannelHandlerContext?) {
     channelHandlerContext = ctx
     super.channelRegistered(ctx)
+  }
+
+  override fun channelUnregistered(ctx: ChannelHandlerContext?) {
+    log.debug("Channel unregistered")
+    super.channelUnregistered(ctx)
   }
 
   override fun channelRead(ctx: ChannelHandlerContext?, msg: Any?) {

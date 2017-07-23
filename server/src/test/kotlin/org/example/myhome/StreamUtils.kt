@@ -1,10 +1,11 @@
 package org.example.myhome
 
-import com.google.gson.Gson
 import org.example.myhome.device_server.simp.SimpMessage
 import org.example.myhome.device_server.simp.SimpMessageType
 import org.example.myhome.device_server.simp.inferTypeFromByte
 import org.example.myhome.device_server.simp.toInt
+import org.example.myhome.utils.parseJson
+import org.example.myhome.utils.writeValue
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -33,8 +34,8 @@ fun InputStream.readSimpMessage():SimpMessage {
   )
 }
 
-fun <T> InputStream.readJson(gson: Gson, clazz: Class<T>): T {
-  return gson.fromJson(this.readString(), clazz)
+fun <T> InputStream.readJson(clazz: Class<T>): T {
+  return parseJson(this.readString(), clazz)
 }
 
 fun OutputStream.writeString(data:String, type: SimpMessageType) {
@@ -50,7 +51,7 @@ fun OutputStream.writeString(data:String, type: SimpMessageType) {
   this.write(data.toByteArray())
 }
 
-fun OutputStream.writeJson(gson:Gson, obj: Any, type: SimpMessageType) {
-  val data = gson.toJson(obj)
+fun OutputStream.writeJson(obj: Any, type: SimpMessageType) {
+  val data = writeValue(obj)
   this.writeString(data, type)
 }

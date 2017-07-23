@@ -1,9 +1,8 @@
 package org.example.myhome.client_controllers
 
-import com.google.gson.Gson
 import org.example.myhome.extension.logger
-import org.example.myhome.services.DeviceCommandTranslator
 import org.example.myhome.services.DeviceRegisterService
+import org.example.myhome.utils.parseJson
 import org.springframework.web.bind.annotation.*
 import java.time.Duration
 
@@ -21,7 +20,6 @@ class DeviceKeyGenController(
   val deviceRegisterService: DeviceRegisterService
 ) {
   companion object{
-    val gson = Gson()
     val log by logger()
   }
   @GetMapping("/ping")
@@ -32,7 +30,7 @@ class DeviceKeyGenController(
     @RequestBody body: String
   ): KeyGenResponse {
     log.debug("Key gen: $body")
-    val request = gson.fromJson(body, KeyGenRequest::class.java)
+    val request = parseJson(body, KeyGenRequest::class.java)
     val deviceKey = deviceRegisterService.generateKey(request.deviceId)
 
     return KeyGenResponse(

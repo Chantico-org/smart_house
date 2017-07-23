@@ -16,7 +16,9 @@ class DeviceRegisterService {
 
   var devicesMetaData:Map<String, DeviceMetaData> = emptyMap()
   private var deviceChannels: Map<String, DeviceInteractHandler> = emptyMap()
-  private var deviceKeys: Map<String, String> = emptyMap()
+  private var deviceKeys: Map<String, String> = mapOf(
+    "test" to "test"
+  )
 
   fun checkDevice(deviceMetaData: DeviceMetaData)
     = deviceKeys[deviceMetaData.deviceId] == deviceMetaData.deviceKey
@@ -25,13 +27,18 @@ class DeviceRegisterService {
     deviceMetaData: DeviceMetaData,
     deviceInteractHandler: DeviceInteractHandler
   ) {
-    if (deviceKeys[deviceMetaData.deviceId] != deviceMetaData.deviceKey) {
+    if (!checkDevice(deviceMetaData)) {
       log.debug("Device with ${deviceMetaData.deviceId} has wrong key")
       return
     }
     log.debug("Registered: $deviceMetaData")
     devicesMetaData += (deviceMetaData.deviceId to deviceMetaData)
     deviceChannels += (deviceMetaData.deviceId to deviceInteractHandler)
+    deviceInteractHandler.channelHandlerContext?.channel()?.closeFuture()?.addListener {
+      log.debug("Device channel closed ${deviceMetaData.deviceId}")
+      devicesMetaData -= deviceMetaData.deviceId
+      deviceChannels -= deviceMetaData.deviceId
+    }
   }
 
   fun generateKey(deviceId: String): String {

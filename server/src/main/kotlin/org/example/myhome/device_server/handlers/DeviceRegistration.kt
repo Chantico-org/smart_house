@@ -1,15 +1,19 @@
 package org.example.myhome.device_server.handlers
 
+import io.netty.channel.ChannelFutureListener
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
 import org.example.myhome.device_server.simp.SimpMessage
 import org.example.myhome.device_server.simp.SimpMessageType
 import org.example.myhome.extension.logger
 import org.example.myhome.models.DeviceMetaData
+import org.example.myhome.services.DeviceRegisterService
 import org.example.myhome.utils.objectMapper
 import java.util.concurrent.TimeUnit
 
-class DeviceRegistration: ChannelInboundHandlerAdapter() {
+class DeviceRegistration(
+  private val deviceRegisterService: DeviceRegisterService
+): ChannelInboundHandlerAdapter() {
   companion object {
     val log by logger()
   }
@@ -18,26 +22,17 @@ class DeviceRegistration: ChannelInboundHandlerAdapter() {
       return
     }
     if (msg is SimpMessage && msg.type == SimpMessageType.REQUEST) {
+      val deviceMetaData = objectMapper.readValue(msg.body, DeviceMetaData::class.java)
+      if (!deviceRegisterService.checkDevice(deviceMetaData)) {
+        ctx.writeAndFlush(SimpMessage(type = SimpMessageType.RESPONSE, body = "NO"))
+          .addListener(ChannelFutureListener.CLOSE)
+        return
+      }
       val handler = DeviceInteractHandler()
       ctx.pipeline().addLast(handler)
       ctx.fireChannelRegistered()
+      deviceRegisterService.registerDevice(deviceMetaData, handler)
       ctx.pipeline().remove(this)
-
-      val config = objectMapper.readValue(msg.body, DeviceMetaData::class.java)
-      log.debug("Config: $config")
-      ctx.channel().eventLoop().schedule({
-        ctx.writeAndFlush(SimpMessage(type = SimpMessageType.RESPONSE, body = "OK"))
-        handler.send("/control/1", "")
-          .doOnNext {
-            log.debug(it)
-          }
-          .subscribe()
-        handler.subscribe("/temperature")
-          .doOnNext {
-            log.debug("Subscribe message: $it")
-          }
-          .subscribe()
-      }, 1, TimeUnit.SECONDS)
       return
     }
     ctx.close()

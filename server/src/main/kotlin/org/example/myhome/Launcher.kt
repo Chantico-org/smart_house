@@ -2,8 +2,6 @@ package org.example.myhome
 
 import com.google.common.eventbus.EventBus
 import io.netty.channel.nio.NioEventLoopGroup
-import org.example.myhome.device_server.DeviceServer
-import org.example.myhome.utils.syncChannel
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.context.annotation.Bean
