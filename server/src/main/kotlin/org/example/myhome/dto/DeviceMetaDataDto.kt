@@ -1,6 +1,6 @@
-package org.example.myhome.models
+package org.example.myhome.dto
 
-data class DeviceMetaData (
+data class DeviceMetaDataDto(
   val deviceId: String,
   val firmwareVersion: Int,
   val deviceKey: String,

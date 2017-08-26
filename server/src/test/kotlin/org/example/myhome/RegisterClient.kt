@@ -5,7 +5,7 @@ import feign.Param
 import feign.RequestLine
 import org.example.myhome.client_controllers.KeyGenRequest
 import org.example.myhome.client_controllers.KeyGenResponse
-import org.example.myhome.models.CommandMeta
+import org.example.myhome.dto.CommandMetaDto
 
 /**
  */
@@ -18,6 +18,6 @@ interface RegisterClient {
   @Headers("Content-Type: application/json")
   fun sendCommand(
     @Param("deviceId") deviceId: String,
-    body: CommandMeta
+    body: CommandMetaDto
   ): Map<String, String>
 }

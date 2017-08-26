@@ -2,8 +2,8 @@ package org.example.myhome.services
 
 import mu.KotlinLogging
 import org.example.myhome.device_server.handlers.DeviceInteractHandler
+import org.example.myhome.dto.DeviceMetaDataDto
 import org.example.myhome.exceptions.DeviceNotFound
-import org.example.myhome.models.DeviceMetaData
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import java.util.*
@@ -14,30 +14,30 @@ class DeviceRegisterService {
     val log = KotlinLogging.logger {  }
   }
 
-  var devicesMetaData:Map<String, DeviceMetaData> = emptyMap()
+  var devicesMetaDataDto:Map<String, DeviceMetaDataDto> = emptyMap()
   private var deviceChannels: Map<String, DeviceInteractHandler> = emptyMap()
   private var deviceKeys: Map<String, String> = mapOf(
     "test" to "test"
   )
 
-  fun checkDevice(deviceMetaData: DeviceMetaData)
-    = deviceKeys[deviceMetaData.deviceId] == deviceMetaData.deviceKey
+  fun checkDevice(deviceMetaDataDto: DeviceMetaDataDto)
+    = deviceKeys[deviceMetaDataDto.deviceId] == deviceMetaDataDto.deviceKey
 
   fun registerDevice(
-    deviceMetaData: DeviceMetaData,
+    deviceMetaDataDto: DeviceMetaDataDto,
     deviceInteractHandler: DeviceInteractHandler
   ) {
-    if (!checkDevice(deviceMetaData)) {
-      log.debug("Device with ${deviceMetaData.deviceId} has wrong key")
+    if (!checkDevice(deviceMetaDataDto)) {
+      log.debug("Device with ${deviceMetaDataDto.deviceId} has wrong key")
       return
     }
-    log.debug("Registered: $deviceMetaData")
-    devicesMetaData += (deviceMetaData.deviceId to deviceMetaData)
-    deviceChannels += (deviceMetaData.deviceId to deviceInteractHandler)
-    deviceInteractHandler.channelHandlerContext?.channel()?.closeFuture()?.addListener {
-      log.debug("Device channel closed ${deviceMetaData.deviceId}")
-      devicesMetaData -= deviceMetaData.deviceId
-      deviceChannels -= deviceMetaData.deviceId
+    log.debug("Registered: $deviceMetaDataDto")
+    devicesMetaDataDto += (deviceMetaDataDto.deviceId to deviceMetaDataDto)
+    deviceChannels += (deviceMetaDataDto.deviceId to deviceInteractHandler)
+    deviceInteractHandler.getCloseFuture().addListener {
+      log.debug("Device channel closed ${deviceMetaDataDto.deviceId}")
+      devicesMetaDataDto -= deviceMetaDataDto.deviceId
+      deviceChannels -= deviceMetaDataDto.deviceId
     }
   }
 

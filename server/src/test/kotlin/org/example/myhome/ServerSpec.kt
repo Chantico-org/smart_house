@@ -2,7 +2,7 @@ package org.example.myhome
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.example.myhome.device_server.simp.SimpMessageType
-import org.example.myhome.models.DeviceMetaData
+import org.example.myhome.dto.DeviceMetaDataDto
 import org.junit.Test
 import java.net.Socket
 import java.util.*
@@ -14,7 +14,7 @@ class ServerSpec {
     println(socket.isConnected)
     val input = socket.inputStream
     val output = socket.outputStream
-    val deviceMetaData = DeviceMetaData(
+    val deviceMetaData = DeviceMetaDataDto(
       deviceId = UUID.randomUUID().toString(),
       deviceKey = UUID.randomUUID().toString(),
       firmwareVersion = 0,
@@ -41,7 +41,7 @@ class ServerSpec {
     val objectMapper = ObjectMapper()
     val input = socket.inputStream
     val output = socket.outputStream
-    val deviceMetaData = DeviceMetaData(
+    val deviceMetaData = DeviceMetaDataDto(
       deviceId = UUID.randomUUID().toString(),
       deviceKey = UUID.randomUUID().toString(),
       firmwareVersion = 0,

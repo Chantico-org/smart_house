@@ -23,6 +23,10 @@ repositories {
   mavenCentral()
 }
 
+bootRun {
+  systemProperties System.properties as Map<String, ?>
+}
+
 compileKotlin {
   kotlinOptions {
     jvmTarget = "1.8"

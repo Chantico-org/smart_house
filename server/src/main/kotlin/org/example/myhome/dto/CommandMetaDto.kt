@@ -1,8 +1,8 @@
-package org.example.myhome.models
+package org.example.myhome.dto
 
 /**
  */
-data class CommandMeta(
+data class CommandMetaDto(
   val controlType:String,
   val command: String
 )
