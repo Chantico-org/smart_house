@@ -5,18 +5,13 @@ import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
 import org.example.myhome.device_server.simp.SimpMessage
 import org.example.myhome.device_server.simp.SimpMessageType
-import org.example.myhome.extension.logger
 import org.example.myhome.models.DeviceMetaData
 import org.example.myhome.services.DeviceRegisterService
 import org.example.myhome.utils.objectMapper
-import java.util.concurrent.TimeUnit
 
 class DeviceRegistration(
   private val deviceRegisterService: DeviceRegisterService
 ): ChannelInboundHandlerAdapter() {
-  companion object {
-    val log by logger()
-  }
   override fun channelRead(ctx: ChannelHandlerContext?, msg: Any?) {
     if (ctx == null) {
       return

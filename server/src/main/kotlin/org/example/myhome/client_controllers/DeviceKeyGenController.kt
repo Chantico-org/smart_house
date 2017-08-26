@@ -1,6 +1,6 @@
 package org.example.myhome.client_controllers
 
-import org.example.myhome.extension.logger
+import mu.KotlinLogging
 import org.example.myhome.services.DeviceRegisterService
 import org.example.myhome.utils.parseJson
 import org.springframework.web.bind.annotation.*
@@ -17,10 +17,10 @@ data class KeyGenRequest(
 
 @RestController
 class DeviceKeyGenController(
-  val deviceRegisterService: DeviceRegisterService
+  private val deviceRegisterService: DeviceRegisterService
 ) {
   companion object{
-    val log by logger()
+    val log = KotlinLogging.logger {  }
   }
   @GetMapping("/ping")
   fun ping() = "Test"

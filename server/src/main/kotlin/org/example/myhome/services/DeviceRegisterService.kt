@@ -1,8 +1,8 @@
 package org.example.myhome.services
 
+import mu.KotlinLogging
 import org.example.myhome.device_server.handlers.DeviceInteractHandler
 import org.example.myhome.exceptions.DeviceNotFound
-import org.example.myhome.extension.logger
 import org.example.myhome.models.DeviceMetaData
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
@@ -11,7 +11,7 @@ import java.util.*
 @Service
 class DeviceRegisterService {
   companion object {
-    val log by logger()
+    val log = KotlinLogging.logger {  }
   }
 
   var devicesMetaData:Map<String, DeviceMetaData> = emptyMap()

@@ -5,3 +5,5 @@
 build/
 local.properties
 *.sublime-workspace
+
+db/
