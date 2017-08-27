@@ -28,14 +28,24 @@ open class ApplicationContext {
 
   @Bean
   @Profile("dev")
-  open fun run(dao: DeviceKeyDao) = CommandLineRunner {
+  open fun run(
+    deviceKeyDao: DeviceKeyDao
+  ) = CommandLineRunner {
     log.debug {
       "Dev is running"
     }
-    log.debug {
-      "Total: ${dao.findAll().toList().size}"
+    val testDeviceID = "00000000-0000-0000-0000-000000000000"
+    val testDeviceKey = "00000000-0000-0000-0000-000000000000"
+    if (deviceKeyDao.findOne(testDeviceID) == null) {
+      log.debug { "Test device key added" }
+      deviceKeyDao.save(DeviceKeyEntity(
+        deviceId = testDeviceID,
+        deviceKey = testDeviceKey
+      ))
     }
-    dao.save(DeviceKeyEntity())
+    log.debug {
+      "Total deviceKeys: ${deviceKeyDao.count()}"
+    }
   }
 
   @Bean("workerGroup")

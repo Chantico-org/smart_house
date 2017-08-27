@@ -5,14 +5,15 @@ import org.example.myhome.services.DeviceRegisterService
 import org.example.myhome.utils.parseJson
 import org.springframework.web.bind.annotation.*
 import java.time.Duration
+import java.util.*
 
 data class KeyGenResponse(
-  val deviceId: String,
+  val deviceId: UUID,
   val deviceKey: String
 )
 
 data class KeyGenRequest(
-  val deviceId: String
+  val deviceId: UUID
 )
 
 @RestController
