@@ -7,14 +7,14 @@ import org.example.myhome.device_server.simp.SimpMessage
 import org.example.myhome.device_server.simp.SimpMessageType
 import org.example.myhome.utils.objectMapper
 import org.example.myhome.utils.writeValue
+import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito
 import reactor.test.StepVerifier
 import java.util.*
 
-// FIXME Fix test
 class DeviceInteractHandlerTest {
-//    @Test(timeout = 1000)
+    @Test(timeout = 1000)
     fun subscribe() {
       val handler = DeviceInteractHandler()
       val context = Mockito.mock(ChannelHandlerContext::class.java)
@@ -22,8 +22,14 @@ class DeviceInteractHandlerTest {
         "topic" to "test",
         "body" to UUID.randomUUID().toString()
       )
+      handler.channelRegistered(context)
+      Mockito.verify(context).fireChannelRegistered()
       StepVerifier.create(handler.subscribe("test").take(1))
         .then {
+          Mockito.verify(context).writeAndFlush(SimpMessage(
+            type = SimpMessageType.SUBSCRIBE,
+            body = "{\"destination\":\"test\"}"
+          ))
           handler.channelRead(context, SimpMessage(type = SimpMessageType.MESSAGE, body = writeValue(message)))
         }
         .expectNext(message["body"])
@@ -33,6 +39,7 @@ class DeviceInteractHandlerTest {
         .verifyComplete()
     }
 
+// FIXME Fix test
 //  @Test(timeout = 1000)
   fun send() {
       val handler = DeviceInteractHandler()

@@ -7,31 +7,31 @@ import org.example.myhome.device_server.simp.SimpMessage
 import org.example.myhome.device_server.simp.SimpMessageHandler
 import org.example.myhome.device_server.simp.SimpMessageType
 import org.example.myhome.utils.objectMapper
+import org.example.myhome.utils.writeValue
 import reactor.core.publisher.Flux
 import reactor.core.publisher.FluxSink
 import reactor.core.publisher.Mono
 import reactor.core.publisher.MonoSink
 import reactor.core.scheduler.Schedulers
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 class DeviceInteractHandler : SimpMessageHandler() {
   companion object {
     val log = KotlinLogging.logger {  }
   }
-  private var currentCorrelationId = Int.MIN_VALUE
+  private val subscribersLock = ReentrantLock()
+  private val sendersLock = ReentrantLock()
+
   private lateinit var channelHandlerContext: ChannelHandlerContext
-  private var senderMap = emptyMap<Int, MonoSink<String>>()
-  private var subscriptionMap = emptyMap<String, FluxSink<String>>()
+  private var currentCorrelationId = Int.MIN_VALUE
+  private var senderSinkMap = emptyMap<Int, MonoSink<String>>()
+  private var subscriptionSinkMap = emptyMap<String, FluxSink<String>>()
+  private var subscriptionCache = emptyMap<String, Flux<String>>()
 
   override fun channelRegistered(ctx: ChannelHandlerContext?) {
     channelHandlerContext = ctx!!
     super.channelRegistered(ctx)
-  }
-
-  override fun channelUnregistered(ctx: ChannelHandlerContext?) {
-    log.debug {
-      "Channel unregistered"
-    }
-    super.channelUnregistered(ctx)
   }
 
   override fun handleSimpMessage(ctx: ChannelHandlerContext, message: SimpMessage) {
@@ -52,7 +52,7 @@ class DeviceInteractHandler : SimpMessageHandler() {
     val correlationId = config["id"]
       ?.asInt()
       ?: 0
-    senderMap[correlationId]?.success(body)
+    senderSinkMap[correlationId]?.success(body)
   }
 
   private fun handleMessage(messageBody: String) {
@@ -63,43 +63,64 @@ class DeviceInteractHandler : SimpMessageHandler() {
     val body = config["body"]
       ?.asText()
       ?: ""
-    subscriptionMap[topic]?.next(body)
+    subscriptionSinkMap[topic]?.next(body)
   }
 
-  fun subscribe(destination: String): Flux<String> {
-    return Flux.create {
-      sink: FluxSink<String> ->
-      subscriptionMap += destination to sink
-      val message = SimpMessage(
-        type = SimpMessageType.SUBSCRIBE,
-        body = "{\"destination\":\"$destination\"}"
-      )
-      channelHandlerContext.writeAndFlush(message)
+  private fun createSubscriptionFlux(destination: String): Flux<String> = Flux
+      .create {
+        sink: FluxSink<String> ->
+        subscribersLock.withLock {
+          subscriptionSinkMap += destination to sink
+        }
+        val message = SimpMessage(
+          type = SimpMessageType.SUBSCRIBE,
+          body = "{\"destination\":\"$destination\"}"
+        )
+        channelHandlerContext.writeAndFlush(message)
 
-    }
+      }
       .doFinally {
-        subscriptionMap -= destination
+        subscribersLock.withLock {
+          subscriptionSinkMap -= destination
+          subscriptionCache -= destination
+        }
       }
       .publishOn(Schedulers.elastic())
+      .publish().refCount()
+
+  fun subscribe(destination: String): Flux<String> = subscribersLock.withLock {
+    if (subscriptionCache.containsKey(destination)) {
+      log.debug {
+        "Flux from cache"
+      }
+      return@withLock subscriptionCache.getValue(destination)
+    }
+    log.debug {
+      "Create new Flux"
+    }
+    val source = createSubscriptionFlux(destination)
+    subscriptionCache += destination to source
+    return@withLock source
   }
 
   fun send(destination: String, body: String): Mono<String> {
     val correlationId = currentCorrelationId++
     return Mono.create {
       sink: MonoSink<String> ->
-      val node = objectMapper.createObjectNode()
-      node.put("destination", destination)
-      node.put("id", correlationId)
-      node.put("body", body)
+      val messageBody = mapOf(
+        "destination" to destination,
+        "id" to correlationId,
+        "body" to body
+      )
       val message = SimpMessage(
         type = SimpMessageType.REQUEST,
-        body = node.toString()
+        body = writeValue(messageBody)
       )
-      senderMap += correlationId to sink
+      senderSinkMap += correlationId to sink
       channelHandlerContext.writeAndFlush(message)
     }
       .doFinally {
-        senderMap -= correlationId
+        senderSinkMap -= correlationId
       }
       .publishOn(Schedulers.elastic())
   }
