@@ -66,40 +66,41 @@ class DeviceInteractHandler : SimpMessageHandler() {
     subscriptionSinkMap[topic]?.next(body)
   }
 
-  private fun createSubscriptionFlux(destination: String): Flux<String> = Flux
+  private fun createSubscriptionFlux(topic: String): Flux<String> = Flux
       .create {
         sink: FluxSink<String> ->
         subscribersLock.withLock {
-          subscriptionSinkMap += destination to sink
+          subscriptionSinkMap += topic to sink
         }
         val message = SimpMessage(
           type = SimpMessageType.SUBSCRIBE,
-          body = "{\"destination\":\"$destination\"}"
+          body = "{\"topic\":\"$topic\"}"
         )
         channelHandlerContext.writeAndFlush(message)
 
       }
       .doFinally {
+//TODO send un-subscribe
         subscribersLock.withLock {
-          subscriptionSinkMap -= destination
-          subscriptionCache -= destination
+          subscriptionSinkMap -= topic
+          subscriptionCache -= topic
         }
       }
       .publishOn(Schedulers.elastic())
       .publish().refCount()
 
-  fun subscribe(destination: String): Flux<String> = subscribersLock.withLock {
-    if (subscriptionCache.containsKey(destination)) {
+  fun subscribe(topic: String): Flux<String> = subscribersLock.withLock {
+    if (subscriptionCache.containsKey(topic)) {
       log.debug {
-        "Flux from cache"
+        "Flux from cache [topic]: $topic"
       }
-      return@withLock subscriptionCache.getValue(destination)
+      return@withLock subscriptionCache.getValue(topic)
     }
     log.debug {
-      "Create new Flux"
+      "Create new Flux [topic]: $topic"
     }
-    val source = createSubscriptionFlux(destination)
-    subscriptionCache += destination to source
+    val source = createSubscriptionFlux(topic)
+    subscriptionCache += topic to source
     return@withLock source
   }
 
