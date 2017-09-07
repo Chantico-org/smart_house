@@ -1,4 +1,3 @@
 # smart_house
-To start server run ./server/gradlew :app:run
 
-**TODO** add bean validation
+[Some docs](https://drive.google.com/drive/folders/0B6jevObHSpxOVURyTXV2b0FFM2M?usp=sharing)
