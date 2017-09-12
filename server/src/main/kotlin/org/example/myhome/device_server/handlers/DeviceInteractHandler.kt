@@ -21,7 +21,6 @@ class DeviceInteractHandler : SimpMessageHandler() {
     val log = KotlinLogging.logger {  }
   }
   private val subscribersLock = ReentrantLock()
-  private val sendersLock = ReentrantLock()
 
   private lateinit var channelHandlerContext: ChannelHandlerContext
   private var currentCorrelationId = Int.MIN_VALUE
@@ -38,7 +37,7 @@ class DeviceInteractHandler : SimpMessageHandler() {
     when(message.type) {
       SimpMessageType.MESSAGE -> handleMessage(messageBody = message.body)
       SimpMessageType.RESPONSE -> handleResponse(responseBody = message.body)
-      else -> ctx.channel().close()
+      else -> ctx.fireChannelRead(message)
     }
   }
 
@@ -94,14 +93,14 @@ class DeviceInteractHandler : SimpMessageHandler() {
       log.debug {
         "Flux from cache [topic]: $topic"
       }
-      return@withLock subscriptionCache.getValue(topic)
+      return subscriptionCache.getValue(topic)
     }
     log.debug {
       "Create new Flux [topic]: $topic"
     }
     val source = createSubscriptionFlux(topic)
     subscriptionCache += topic to source
-    return@withLock source
+    return source
   }
 
   fun send(destination: String, body: String): Mono<String> {

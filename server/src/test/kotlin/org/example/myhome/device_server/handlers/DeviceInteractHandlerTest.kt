@@ -28,7 +28,7 @@ class DeviceInteractHandlerTest {
         .then {
           Mockito.verify(context).writeAndFlush(SimpMessage(
             type = SimpMessageType.SUBSCRIBE,
-            body = "{\"destination\":\"test\"}"
+            body = "{\"topic\":\"test\"}"
           ))
           handler.channelRead(context, SimpMessage(type = SimpMessageType.MESSAGE, body = writeValue(message)))
         }
@@ -39,8 +39,7 @@ class DeviceInteractHandlerTest {
         .verifyComplete()
     }
 
-// FIXME Fix test
-//  @Test(timeout = 1000)
+  @Test(timeout = 1000)
   fun send() {
       val handler = DeviceInteractHandler()
       val captor = ArgumentCaptor.forClass(SimpMessage::class.java)

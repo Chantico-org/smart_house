@@ -1,26 +1,34 @@
 package org.example.myhome.device_server.simp
 
+import io.netty.buffer.ByteBuf
+import io.netty.buffer.ByteBufUtil
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.MessageToMessageCodec
+import java.nio.CharBuffer
+import java.nio.charset.Charset
 
 /**
  * Created by alexei on 15.06.17.
  */
-class SimpCodec: MessageToMessageCodec<String, SimpMessage>() {
-  override fun decode(ctx: ChannelHandlerContext?, msg: String?, out: MutableList<Any>?) {
-    if (msg == null || out == null) return
+class SimpCodec(
+  val charset: Charset = Charset.defaultCharset()
+): MessageToMessageCodec<ByteBuf, SimpMessage>() {
+  override fun decode(ctx: ChannelHandlerContext?, msg: ByteBuf?, out: MutableList<Any>?) {
+    if (msg == null || out == null || ctx == null) return
     try {
-      val type = inferTypeFromByte(msg[0].toByte())
-      out.add(SimpMessage(type = type, body = msg.substring(1)))
+      val type = inferTypeFromByte(msg.readByte())
+      out.add(SimpMessage(type = type, body = msg.toString(charset)))
     } catch(e: Error) {
-      ctx?.close();
+      ctx.close()
     }
   }
 
   override fun encode(ctx: ChannelHandlerContext?, msg: SimpMessage?, out: MutableList<Any>?) {
-    println("Encoding")
+    if (ctx == null) {
+      return
+    }
     if (msg == null || out == null) return
     val text = msg.type.toByteString() + msg.body
-    out.add(text)
+    out.add(ByteBufUtil.encodeString(ctx.alloc(), CharBuffer.wrap(text), charset))
   }
 }

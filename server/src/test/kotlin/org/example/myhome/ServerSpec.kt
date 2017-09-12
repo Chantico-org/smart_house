@@ -8,9 +8,9 @@ import java.net.Socket
 import java.util.*
 
 class ServerSpec {
-  @Test
+  @Test(timeout = 1000)
   fun testRegistration() {
-    val socket = Socket("192.168.0.104", 7080)
+    val socket = Socket("localhost", 7080)
     println(socket.isConnected)
     val input = socket.inputStream
     val output = socket.outputStream
@@ -22,16 +22,16 @@ class ServerSpec {
       controls = listOf(0, 1, 3)
     )
     output.writeJson(deviceMetaData, SimpMessageType.REQUEST)
-    println(input.readSimpMessage())
-    println(input.readSimpMessage())
-    output.writeJson(mapOf(
-      "topic" to "/test",
-      "body" to "My body"
-    ), SimpMessageType.MESSAGE)
-    output.writeJson(mapOf(
-      "topic" to "/test",
-      "body" to "My body"
-    ), SimpMessageType.MESSAGE)
+//    println(input.readSimpMessage())
+//    println(input.readSimpMessage())
+//    output.writeJson(mapOf(
+//      "topic" to "/test",
+//      "body" to "My body"
+//    ), SimpMessageType.MESSAGE)
+//    output.writeJson(mapOf(
+//      "topic" to "/test",
+//      "body" to "My body"
+//    ), SimpMessageType.MESSAGE)
     socket.close()
   }
 

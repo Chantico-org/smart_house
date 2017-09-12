@@ -31,14 +31,12 @@ open class DeviceServer (
     val init =object: ChannelInitializer<SocketChannel>(){
       override fun initChannel(ch: SocketChannel?) {
         ch?.pipeline()?.addLast(
-          LoggingHandler(),
 //          decoders
           LengthFieldBasedFrameDecoder(Int.MAX_VALUE, 0, 4, 0, 4),
-          StringDecoder(),
 //          encoders
           LengthFieldPrepender(4),
-          StringEncoder(),
           SimpCodec(),
+          LoggingHandler(),
           DeviceRegistration(deviceRegisterService)
         )
       }

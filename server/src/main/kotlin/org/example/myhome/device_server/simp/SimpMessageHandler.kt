@@ -15,7 +15,7 @@ abstract class SimpMessageHandler: ChannelInboundHandlerAdapter() {
     }
     when (msg) {
       is SimpMessage -> handleSimpMessage(ctx, msg)
-      else -> ctx.channel().close()
+      else -> ctx.fireChannelRead(msg)
     }
   }
 }
