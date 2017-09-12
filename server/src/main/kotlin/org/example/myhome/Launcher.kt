@@ -1,6 +1,5 @@
 package org.example.myhome
 
-import com.google.common.eventbus.EventBus
 import io.netty.channel.nio.NioEventLoopGroup
 import mu.KotlinLogging
 import org.example.myhome.dao.DeviceKeyDao
@@ -19,9 +18,6 @@ open class ApplicationContext {
   companion object {
       val log = KotlinLogging.logger {  }
   }
-
-  @Bean("eventBus")
-  open fun eventBus():EventBus = EventBus()
 
   @Bean("bossGroup")
   open fun bossGroup(): NioEventLoopGroup = NioEventLoopGroup()
