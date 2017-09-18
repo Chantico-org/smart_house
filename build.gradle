@@ -30,3 +30,15 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 */
+
+allprojects {
+  buildscript {
+    ext.netty_version = '4.1.15.Final'
+    repositories {
+      mavenCentral()
+    }
+  }
+  repositories {
+    mavenCentral()
+  }
+}

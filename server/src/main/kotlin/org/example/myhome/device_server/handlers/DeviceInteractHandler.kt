@@ -3,9 +3,9 @@ package org.example.myhome.device_server.handlers
 import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelHandlerContext
 import mu.KotlinLogging
-import org.example.myhome.device_server.simp.SimpMessage
-import org.example.myhome.device_server.simp.SimpMessageHandler
-import org.example.myhome.device_server.simp.SimpMessageType
+import org.example.myhome.simp.core.SimpMessage
+import org.example.myhome.simp.core.SimpMessageHandler
+import org.example.myhome.simp.core.SimpMessageType
 import org.example.myhome.utils.objectMapper
 import org.example.myhome.utils.writeValue
 import reactor.core.publisher.Flux

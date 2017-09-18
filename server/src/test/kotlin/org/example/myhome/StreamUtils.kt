@@ -1,9 +1,9 @@
 package org.example.myhome
 
-import org.example.myhome.device_server.simp.SimpMessage
-import org.example.myhome.device_server.simp.SimpMessageType
-import org.example.myhome.device_server.simp.inferTypeFromByte
-import org.example.myhome.device_server.simp.toInt
+import org.example.myhome.simp.core.SimpMessage
+import org.example.myhome.simp.core.SimpMessageType
+import org.example.myhome.simp.core.inferTypeFromByte
+import org.example.myhome.simp.core.toInt
 import org.example.myhome.utils.parseJson
 import org.example.myhome.utils.writeValue
 import java.io.InputStream

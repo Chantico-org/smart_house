@@ -1,4 +1,4 @@
-package org.example.myhome.device_server.simp
+package org.example.myhome.simp.core
 
 /**
  * Created by alexei on 14.06.17.

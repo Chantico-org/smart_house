@@ -6,14 +6,11 @@ import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.SocketChannel
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder
 import io.netty.handler.codec.LengthFieldPrepender
-import io.netty.handler.codec.string.StringDecoder
-import io.netty.handler.codec.string.StringEncoder
 import io.netty.handler.logging.LoggingHandler
 import org.example.myhome.device_server.handlers.DeviceRegistration
-import org.example.myhome.device_server.simp.SimpCodec
 import org.example.myhome.server.startNettyServer
 import org.example.myhome.services.DeviceRegisterService
-import org.springframework.beans.factory.annotation.Autowired
+import org.example.myhome.simp.core.SimpCodec
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 

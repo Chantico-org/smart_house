@@ -1,4 +1,4 @@
-package org.example.myhome.device_server.simp
+package org.example.myhome.simp.core
 
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter

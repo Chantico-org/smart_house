@@ -3,8 +3,8 @@ package org.example.myhome.device_server.handlers
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import io.netty.channel.ChannelHandlerContext
-import org.example.myhome.device_server.simp.SimpMessage
-import org.example.myhome.device_server.simp.SimpMessageType
+import org.example.myhome.simp.core.SimpMessage
+import org.example.myhome.simp.core.SimpMessageType
 import org.example.myhome.utils.objectMapper
 import org.example.myhome.utils.writeValue
 import org.junit.Test

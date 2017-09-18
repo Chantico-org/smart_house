@@ -31,6 +31,7 @@ compileKotlin {
 }
 
 dependencies {
+  compile project(':simp-protocol-kt')
   // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib
   compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib'
   // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-reflect
@@ -47,7 +48,7 @@ dependencies {
   compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: jackson_version
 
   // https://mvnrepository.com/artifact/io.netty/netty-all
-  compile group: 'io.netty', name: 'netty-all', version: '4.1.7.Final'
+  compile group: 'io.netty', name: 'netty-all', version: netty_version
 
   // https://mvnrepository.com/artifact/io.projectreactor/reactor-core
   compile group: 'io.projectreactor', name: 'reactor-core', version: reactor_version

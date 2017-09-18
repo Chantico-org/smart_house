@@ -2,11 +2,11 @@ package org.example.myhome.device_server.handlers
 
 import io.netty.channel.ChannelFutureListener
 import io.netty.channel.ChannelHandlerContext
-import org.example.myhome.device_server.simp.SimpMessage
-import org.example.myhome.device_server.simp.SimpMessageHandler
-import org.example.myhome.device_server.simp.SimpMessageType
 import org.example.myhome.dto.DeviceMetaDataDto
 import org.example.myhome.services.DeviceRegisterService
+import org.example.myhome.simp.core.SimpMessage
+import org.example.myhome.simp.core.SimpMessageHandler
+import org.example.myhome.simp.core.SimpMessageType
 import org.example.myhome.utils.objectMapper
 
 class DeviceRegistration(

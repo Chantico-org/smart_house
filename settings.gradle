@@ -19,3 +19,4 @@ include 'services:webservice'
 rootProject.name = 'smart_house'
 
 include ':server'
+include ':simp-protocol-kt'

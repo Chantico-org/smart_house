@@ -1,4 +1,4 @@
-package org.example.myhome.device_server.simp
+package org.example.myhome.simp.core
 
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.ByteBufUtil

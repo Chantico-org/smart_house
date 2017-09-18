@@ -1,8 +1,8 @@
 package org.example.myhome
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.example.myhome.device_server.simp.SimpMessageType
 import org.example.myhome.dto.DeviceMetaDataDto
+import org.example.myhome.simp.core.SimpMessageType
 import org.junit.Test
 import java.net.Socket
 import java.util.*
