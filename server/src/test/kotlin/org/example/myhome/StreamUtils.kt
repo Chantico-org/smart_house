@@ -9,7 +9,7 @@ import org.example.myhome.utils.writeValue
 import java.io.InputStream
 import java.io.OutputStream
 
-fun InputStream.readString():String {
+fun InputStream.readString(): String {
   val sizeBuffer = ByteArray(4)
   this.read(sizeBuffer)
 
@@ -19,13 +19,13 @@ fun InputStream.readString():String {
     length = length or byte.toInt()
     length = length shl 8
   }
-  length = length or sizeBuffer[(sizeBuffer.size -1)].toInt()
+  length = length or sizeBuffer[(sizeBuffer.size - 1)].toInt()
   val buffer = ByteArray(length)
   this.read(buffer)
   return kotlin.text.String(buffer)
 }
 
-fun InputStream.readSimpMessage():SimpMessage {
+fun InputStream.readSimpMessage(): SimpMessage {
   val text = this.readString()
   println(text)
   return SimpMessage(
@@ -38,15 +38,15 @@ fun <T> InputStream.readJson(clazz: Class<T>): T {
   return parseJson(this.readString(), clazz)
 }
 
-fun OutputStream.writeString(data:String, type: SimpMessageType) {
-  val length_buffer: ByteArray = ByteArray(4)
-  var data_length = data.length + 1
+fun OutputStream.writeString(data: String, type: SimpMessageType) {
+  val lengthBuffer = ByteArray(4)
+  var dataLength = data.length + 1
   for (i in 3 downTo 0) {
-    val byte = data_length and 255
-    length_buffer[i] = byte.toByte()
-    data_length = data_length shr 8
+    val byte = dataLength and 255
+    lengthBuffer[i] = byte.toByte()
+    dataLength = dataLength shr 8
   }
-  this.write(length_buffer)
+  this.write(lengthBuffer)
   this.write(type.toInt())
   this.write(data.toByteArray())
 }

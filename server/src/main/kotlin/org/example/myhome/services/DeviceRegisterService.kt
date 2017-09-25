@@ -2,7 +2,7 @@ package org.example.myhome.services
 
 import mu.KotlinLogging
 import org.example.myhome.dao.DeviceKeyDao
-import org.example.myhome.device_server.handlers.DeviceInteractHandler
+import org.example.myhome.server.device.handlers.DeviceInteractHandler
 import org.example.myhome.dto.DeviceMetaDataDto
 import org.example.myhome.entity.DeviceKeyEntity
 import org.example.myhome.exceptions.DeviceNotFound
