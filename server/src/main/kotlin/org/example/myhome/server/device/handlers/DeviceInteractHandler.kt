@@ -49,15 +49,15 @@ class DeviceInteractHandler : SimpMessageHandler() {
 
   private fun handleResponse(responseBody: String) {
     val json = objectMapper.readTree(responseBody)
-    val body: String? = parse(json, MessageSegment.BODY)
-    val correlationId: Int? = parse(json, MessageSegment.ID)
+    val body: String = parse(json, MessageSegment.BODY)
+    val correlationId: Int = parse(json, MessageSegment.ID)
     senderSinkMap[correlationId]?.success(body)
   }
 
   private fun handleMessage(messageBody: String) {
     val json = objectMapper.readTree(messageBody)
-    val topic: String? = parse(json, MessageSegment.TOPIC)
-    val body: String? = parse(json, MessageSegment.BODY)
+    val topic: String = parse(json, MessageSegment.TOPIC)
+    val body: String = parse(json, MessageSegment.BODY)
     subscriptionSinkMap[topic]?.next(body)
   }
 

@@ -18,15 +18,15 @@ enum class MessageSegment(val segmentName: String) {
   TOPIC("topic")
 }
 
-inline fun <reified T> parse(json: JsonNode, messageSegment: MessageSegment): T? {
-  val segment: Any? = with(messageSegment) {
+inline fun <reified T> parse(json: JsonNode, messageSegment: MessageSegment): T {
+  val segment: Any = with(messageSegment) {
     when (T::class) {
       String::class -> json[segmentName].toString()
       Int::class -> json[segmentName].toInt()
       else -> throw RuntimeException("Parse error [expected ${T::class} in field ${segmentName}]")
     }
   }
-  return segment as T?
+  return segment as T
 }
 
 fun JsonNode.toInt(): Int {
