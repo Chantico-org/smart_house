@@ -30,6 +30,16 @@ compileKotlin {
   }
 }
 
+compileTestKotlin {
+  kotlinOptions{
+    jvmTarget = "1.8"
+  }
+}
+
+test {
+  useTestNG()
+}
+
 dependencies {
   compile project(':simp-protocol-kt')
   // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib
@@ -57,13 +67,16 @@ dependencies {
 
   // https://mvnrepository.com/artifact/junit/junit
   testCompile group: 'junit', name: 'junit', version: '4.12'
+  // https://mvnrepository.com/artifact/org.testng/testng
+  testCompile group: 'org.testng', name: 'testng', version: '6.11'
+  // https://mvnrepository.com/artifact/org.assertj/assertj-core
+  testCompile group: 'org.assertj', name: 'assertj-core', version: '3.8.0'
   // https://mvnrepository.com/artifact/com.natpryce/hamkrest
   testCompile group: 'com.natpryce', name: 'hamkrest', version: '1.4.0.0'
   // https://mvnrepository.com/artifact/com.netflix.feign/feign-core
   testCompile group: 'com.netflix.feign', name: 'feign-core', version: feign_version
   // https://mvnrepository.com/artifact/org.mockito/mockito-all
   testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
-
   // https://mvnrepository.com/artifact/io.projectreactor.addons/reactor-test
   testCompile group: 'io.projectreactor.addons', name: 'reactor-test', version: reactor_version
 }

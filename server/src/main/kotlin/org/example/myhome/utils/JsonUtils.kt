@@ -1,5 +1,6 @@
 package org.example.myhome.utils
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 
@@ -11,18 +12,24 @@ fun <T> parseJson(message: String, clazz: Class<T>) =
 fun writeValue(message: Any) =
   objectMapper.writeValueAsString(message)
 
-enum class MessageSegment(val type: Class<*>, val segmentName: String) {
-  BODY(String::class.java, "body"),
-  ID(Int::class.java, "id"),
-  TOPIC(String::class.java, "topic")
+enum class MessageSegment(val segmentName: String) {
+  BODY("body"),
+  ID("id"),
+  TOPIC("topic")
 }
 
-inline fun <reified T> parse(responseBody: String, segment: MessageSegment): T? {
-  val config = objectMapper.readTree(responseBody)
-  val any: Any? = when (segment.type) {
-    String::class.java -> config[segment.segmentName]?.asText()
-    Int::class.java -> config[segment.segmentName]?.asInt()
-    else -> null
+inline fun <reified T> parse(json: JsonNode, messageSegment: MessageSegment): T? {
+  val segment: Any? = with(messageSegment) {
+    when (T::class) {
+      String::class -> json[segmentName].toString()
+      Int::class -> json[segmentName].toInt()
+      else -> throw RuntimeException("Parse error [expected ${T::class} in field ${segmentName}]")
+    }
   }
-  return any as T?
+  return segment as T?
+}
+
+fun JsonNode.toInt(): Int {
+  return if (this.isInt) this.asInt()
+  else throw RuntimeException("Parse error [expected Int]")
 }
