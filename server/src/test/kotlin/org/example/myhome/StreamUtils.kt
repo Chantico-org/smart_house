@@ -22,12 +22,11 @@ fun InputStream.readString(): String {
   length = length or sizeBuffer[(sizeBuffer.size - 1)].toInt()
   val buffer = ByteArray(length)
   this.read(buffer)
-  return kotlin.text.String(buffer)
+  return String(buffer)
 }
 
 fun InputStream.readSimpMessage(): SimpMessage {
   val text = this.readString()
-  println(text)
   return SimpMessage(
     type = inferTypeFromByte(text[0].toByte()),
     body = text.substring(1)
