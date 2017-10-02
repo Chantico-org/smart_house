@@ -4,17 +4,35 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.example.myhome.dto.DeviceMetaDataDto
 import org.example.myhome.simp.core.SimpMessageType
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
+import java.io.InputStream
+import java.io.OutputStream
 import java.net.Socket
 import java.util.*
 
 //TODO move it to separate module with integration tests
 class ServerSpec {
-  @Test(timeout = 1000)
+
+  lateinit var socket: Socket
+  lateinit var inputStream: InputStream
+  lateinit var outputStream: OutputStream
+
+  @Before
+  fun setUp() {
+    socket = Socket("localhost", 7080)
+    inputStream = socket.inputStream
+    outputStream = socket.outputStream
+  }
+
+  @After
+  fun tearDown() {
+    socket.close()
+  }
+
+  @Test(timeout = 10000)
   fun testRegistration() {
-    val socket = Socket("localhost", 7080)
-    val inputStream = socket.inputStream
-    val outputStream = socket.outputStream
     val deviceMetaData = DeviceMetaDataDto(
       deviceId = UUID.randomUUID().toString(),
       deviceKey = UUID.randomUUID().toString(),
@@ -28,6 +46,5 @@ class ServerSpec {
     assertThat(response.body, equalTo("NO"))
 //    assert that client is disconnected
     assertThat(inputStream.read(), equalTo(-1))
-    socket.close()
   }
 }
