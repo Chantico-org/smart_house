@@ -84,14 +84,10 @@ class DeviceInteractHandler : SimpMessageHandler() {
 
   fun subscribe(topic: String): Flux<String> = subscribersLock.withLock {
     if (subscriptionCache.containsKey(topic)) {
-      log.debug {
-        "Flux from cache [topic]: $topic"
-      }
+      log.debug { "Flux from cache [topic]: $topic" }
       return subscriptionCache.getValue(topic)
     }
-    log.debug {
-      "Create new Flux [topic]: $topic"
-    }
+    log.debug { "Create new Flux [topic]: $topic" }
     val source = createSubscriptionFlux(topic)
     subscriptionCache += topic to source
     return source
@@ -100,6 +96,7 @@ class DeviceInteractHandler : SimpMessageHandler() {
   fun send(destination: String, body: String): Mono<String> {
     val correlationId = currentCorrelationId++
     return Mono.create { sink: MonoSink<String> ->
+      // TODO: possibly use MessageSegment
       val messageBody = mapOf(
         "destination" to destination,
         "id" to correlationId,
@@ -115,4 +112,5 @@ class DeviceInteractHandler : SimpMessageHandler() {
       senderSinkMap -= correlationId
     }.publishOn(Schedulers.elastic())
   }
+
 }

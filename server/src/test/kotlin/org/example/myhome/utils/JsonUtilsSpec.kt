@@ -7,7 +7,7 @@ class JsonUtilsSpec {
 
   private val someBody = """
       |{
-        |"somefield":"somevalue"
+        |\"somefield\":\"somevalue\"
       |}
   """.trimMargin().replace("\n", "")
 
@@ -16,7 +16,7 @@ class JsonUtilsSpec {
   private val someJson = """
       |{
         |"id":42,
-        |"body":$someBody,
+        |"body":"$someBody",
         |"topic":"$topicName"
       |}
   """.trimMargin().replace("\n", "")
@@ -26,7 +26,7 @@ class JsonUtilsSpec {
   @Test
   fun parseBody() {
     val body: String = parse(json, MessageSegment.BODY)
-    assertThat(body).isEqualTo(someBody)
+    assertThat(body).isEqualTo(someBody.replace("\\\"", "\""))
   }
 
   @Test

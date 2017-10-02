@@ -21,7 +21,7 @@ enum class MessageSegment(val segmentName: String) {
 inline fun <reified T> parse(json: JsonNode, messageSegment: MessageSegment): T {
   val segment: Any = with(messageSegment) {
     when (T::class) {
-      String::class -> json[segmentName].toString()
+      String::class -> json[segmentName].asText()
       Int::class -> json[segmentName].toInt()
       else -> throw RuntimeException("Parse error [expected ${T::class} in field ${segmentName}]")
     }
