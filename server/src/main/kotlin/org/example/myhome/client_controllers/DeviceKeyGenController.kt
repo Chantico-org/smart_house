@@ -1,8 +1,9 @@
 package org.example.myhome.client_controllers
 
+import com.fasterxml.jackson.module.kotlin.readValue
 import mu.KotlinLogging
 import org.example.myhome.services.DeviceRegisterService
-import org.example.myhome.utils.parseJson
+import org.example.myhome.utils.objectMapper
 import org.springframework.web.bind.annotation.*
 import java.time.Duration
 import java.util.*
@@ -31,7 +32,7 @@ class DeviceKeyGenController(
     @RequestBody body: String
   ): KeyGenResponse {
     log.debug("Key gen: $body")
-    val request = parseJson(body, KeyGenRequest::class.java)
+    val request: KeyGenRequest = objectMapper.readValue(body)
     val deviceKey = deviceRegisterService.generateKey(request.deviceId)
 
     return KeyGenResponse(

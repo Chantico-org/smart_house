@@ -2,6 +2,7 @@ package org.example.myhome.device_server.handlers
 
 import io.netty.channel.ChannelFutureListener
 import io.netty.channel.ChannelHandlerContext
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder
 import org.example.myhome.dto.DeviceMetaDataDto
 import org.example.myhome.services.DeviceRegisterService
 import org.example.myhome.simp.core.SimpMessage
@@ -31,5 +32,11 @@ class DeviceRegistration(
     ctx.fireChannelRegistered()
     deviceRegisterService.registerDevice(deviceMetaData, handler)
     ctx.pipeline().remove(this)
+    val lengthFieldDecoder = LengthFieldBasedFrameDecoder(Int.MAX_VALUE, 0, 4, 0, 4)
+    ctx.pipeline().replace("lengthDecoder", "lengthDecoder", lengthFieldDecoder)
+  }
+
+  override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
+    ctx.channel().close()
   }
 }

@@ -5,7 +5,4 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 
 val objectMapper = ObjectMapper().registerKotlinModule()
 
-fun <T> parseJson(message: String, clazz: Class<T>)
-  = objectMapper.readValue(message, clazz)
-
-fun writeValue(message: Any) = objectMapper.writeValueAsString(message)
+fun writeValue(message: Any): String = objectMapper.writeValueAsString(message)
