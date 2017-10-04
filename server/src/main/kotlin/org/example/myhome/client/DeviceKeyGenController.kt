@@ -1,10 +1,10 @@
-package org.example.myhome.client_controllers
+package org.example.myhome.client
 
 import mu.KotlinLogging
 import org.example.myhome.services.DeviceRegisterService
 import org.example.myhome.utils.parseJson
+import org.example.myhome.utils.seconds
 import org.springframework.web.bind.annotation.*
-import java.time.Duration
 import java.util.*
 
 data class KeyGenResponse(
@@ -48,9 +48,10 @@ class DeviceKeyGenController(
     println(state)
     val response = deviceRegisterService
       .sendToDevice(deviceId, "/control/1", state)
-      .block(Duration.ofSeconds(30))
+      .block(30.seconds)
     return mapOf(
       "response" to response
     )
   }
+
 }

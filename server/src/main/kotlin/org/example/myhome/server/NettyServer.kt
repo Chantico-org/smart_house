@@ -14,11 +14,11 @@ fun startNettyServer(
   workerGroup: EventLoopGroup,
   initializer: ChannelInitializer<SocketChannel>
 ): ChannelFuture? {
-  val b = ServerBootstrap()
-  b.group(bossGroup, workerGroup)
+  val bootstrap = ServerBootstrap()
+  bootstrap.group(bossGroup, workerGroup)
     .channel(NioServerSocketChannel::class.java)
     .childHandler(initializer)
     .option(ChannelOption.SO_BACKLOG, 128)
     .childOption(ChannelOption.SO_KEEPALIVE, true)
-  return b.bind(port)
+  return bootstrap.bind(port)
 }
