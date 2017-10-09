@@ -1,4 +1,4 @@
-package org.example.myhome.device_server.handlers
+package org.example.myhome.server.device.handlers
 
 import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelHandlerContext
@@ -6,7 +6,9 @@ import mu.KotlinLogging
 import org.example.myhome.simp.core.SimpMessage
 import org.example.myhome.simp.core.SimpMessageHandler
 import org.example.myhome.simp.core.SimpMessageType
+import org.example.myhome.utils.MessageSegment
 import org.example.myhome.utils.objectMapper
+import org.example.myhome.utils.parse
 import org.example.myhome.utils.writeValue
 import reactor.core.publisher.Flux
 import reactor.core.publisher.FluxSink
@@ -18,8 +20,9 @@ import kotlin.concurrent.withLock
 
 class DeviceInteractHandler : SimpMessageHandler() {
   companion object {
-    val log = KotlinLogging.logger {  }
+    val log = KotlinLogging.logger { }
   }
+
   private val subscribersLock = ReentrantLock()
 
   private lateinit var channelHandlerContext: ChannelHandlerContext
@@ -34,70 +37,57 @@ class DeviceInteractHandler : SimpMessageHandler() {
   }
 
   override fun handleSimpMessage(ctx: ChannelHandlerContext, message: SimpMessage) {
-    when(message.type) {
+    when (message.type) {
       SimpMessageType.MESSAGE -> handleMessage(messageBody = message.body)
       SimpMessageType.RESPONSE -> handleResponse(responseBody = message.body)
       else -> ctx.fireChannelRead(message)
     }
   }
 
-  fun getCloseFuture(): ChannelFuture = channelHandlerContext.channel().closeFuture()
+  fun getCloseFuture(): ChannelFuture =
+    channelHandlerContext.channel().closeFuture()
 
   private fun handleResponse(responseBody: String) {
-    val config = objectMapper.readTree(responseBody)
-    val body = config["body"]
-      ?.asText()
-      ?: ""
-    val correlationId = config["id"]
-      ?.asInt()
-      ?: 0
+    val json = objectMapper.readTree(responseBody)
+    val body: String = parse(json, MessageSegment.BODY)
+    val correlationId: Int = parse(json, MessageSegment.ID)
     senderSinkMap[correlationId]?.success(body)
   }
 
   private fun handleMessage(messageBody: String) {
-    val config = objectMapper.readTree(messageBody)
-    val topic = config["topic"]
-      ?.asText()
-      ?: ""
-    val body = config["body"]
-      ?.asText()
-      ?: ""
+    val json = objectMapper.readTree(messageBody)
+    val topic: String = parse(json, MessageSegment.TOPIC)
+    val body: String = parse(json, MessageSegment.BODY)
     subscriptionSinkMap[topic]?.next(body)
   }
 
-  private fun createSubscriptionFlux(topic: String): Flux<String> = Flux
-      .create {
-        sink: FluxSink<String> ->
-        subscribersLock.withLock {
-          subscriptionSinkMap += topic to sink
-        }
-        val message = SimpMessage(
-          type = SimpMessageType.SUBSCRIBE,
-          body = "{\"topic\":\"$topic\"}"
-        )
-        channelHandlerContext.writeAndFlush(message)
-
+  private fun createSubscriptionFlux(topic: String): Flux<String> =
+    Flux.create { sink: FluxSink<String> ->
+      subscribersLock.withLock {
+        subscriptionSinkMap += topic to sink
       }
-      .doFinally {
-//TODO send un-subscribe
-        subscribersLock.withLock {
-          subscriptionSinkMap -= topic
-          subscriptionCache -= topic
-        }
+      val message = SimpMessage(
+        type = SimpMessageType.SUBSCRIBE,
+        body = "{\"topic\":\"$topic\"}"
+      )
+      channelHandlerContext.writeAndFlush(message)
+    }.doFinally {
+      //TODO send un-subscribe
+      subscribersLock.withLock {
+        subscriptionSinkMap -= topic
+        subscriptionCache -= topic
       }
+    }
       .publishOn(Schedulers.elastic())
-      .publish().refCount()
+      .publish()
+      .refCount()
 
   fun subscribe(topic: String): Flux<String> = subscribersLock.withLock {
     if (subscriptionCache.containsKey(topic)) {
-      log.debug {
-        "Flux from cache [topic]: $topic"
-      }
+      log.debug { "Flux from cache [topic]: $topic" }
       return subscriptionCache.getValue(topic)
     }
-    log.debug {
-      "Create new Flux [topic]: $topic"
-    }
+    log.debug { "Create new Flux [topic]: $topic" }
     val source = createSubscriptionFlux(topic)
     subscriptionCache += topic to source
     return source
@@ -105,8 +95,8 @@ class DeviceInteractHandler : SimpMessageHandler() {
 
   fun send(destination: String, body: String): Mono<String> {
     val correlationId = currentCorrelationId++
-    return Mono.create {
-      sink: MonoSink<String> ->
+    return Mono.create { sink: MonoSink<String> ->
+      // TODO: possibly use MessageSegment
       val messageBody = mapOf(
         "destination" to destination,
         "id" to correlationId,
@@ -118,10 +108,9 @@ class DeviceInteractHandler : SimpMessageHandler() {
       )
       senderSinkMap += correlationId to sink
       channelHandlerContext.writeAndFlush(message)
-    }
-      .doFinally {
-        senderSinkMap -= correlationId
-      }
-      .publishOn(Schedulers.elastic())
+    }.doFinally {
+      senderSinkMap -= correlationId
+    }.publishOn(Schedulers.elastic())
   }
+
 }

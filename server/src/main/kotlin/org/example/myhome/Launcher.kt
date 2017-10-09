@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Profile
 open class ApplicationContext {
 
   companion object {
-      val log = KotlinLogging.logger {  }
+    val log = KotlinLogging.logger { }
   }
 
   @Bean("bossGroup")
@@ -24,24 +24,18 @@ open class ApplicationContext {
 
   @Bean
   @Profile("dev")
-  open fun run(
-    deviceKeyDao: DeviceKeyDao
-  ) = CommandLineRunner {
-    log.debug {
-      "Dev is running"
-    }
+  open fun run(deviceKeyDao: DeviceKeyDao) = CommandLineRunner {
+    log.debug("Dev is running")
     val testDeviceID = "00000000-0000-0000-0000-000000000000"
     val testDeviceKey = "00000000-0000-0000-0000-000000000000"
     if (deviceKeyDao.findOne(testDeviceID) == null) {
-      log.debug { "Test device key added" }
+      log.debug("Test device key added")
       deviceKeyDao.save(DeviceKeyEntity(
         deviceId = testDeviceID,
         deviceKey = testDeviceKey
       ))
     }
-    log.debug {
-      "Total deviceKeys: ${deviceKeyDao.count()}"
-    }
+    log.debug("Total deviceKeys: ${deviceKeyDao.count()}")
   }
 
   @Bean("workerGroup")

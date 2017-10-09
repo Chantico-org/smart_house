@@ -1,4 +1,4 @@
-package org.example.myhome.device_server.handlers
+package org.example.myhome.server.device.handlers
 
 import io.netty.channel.ChannelFutureListener
 import io.netty.channel.ChannelHandlerContext

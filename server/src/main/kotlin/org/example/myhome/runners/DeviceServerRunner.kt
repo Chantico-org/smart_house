@@ -1,11 +1,8 @@
 package org.example.myhome.runners
 
-import org.example.myhome.device_server.DeviceServer
-import org.example.myhome.utils.syncChannel
-import org.springframework.boot.CommandLineRunner
+import org.example.myhome.server.device.DeviceServer
 import org.springframework.context.ApplicationListener
 import org.springframework.context.event.ContextRefreshedEvent
-import org.springframework.context.event.ContextStartedEvent
 import org.springframework.stereotype.Component
 
 /**

@@ -6,9 +6,9 @@ import io.github.benas.randombeans.EnhancedRandomBuilder
 import io.github.benas.randombeans.api.EnhancedRandom
 import org.example.myhome.dto.DeviceMetaDataDto
 import org.example.myhome.simp.core.SimpMessageType
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.testng.annotations.AfterMethod
+import org.testng.annotations.BeforeMethod
+import org.testng.annotations.Test
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.Socket
@@ -21,19 +21,19 @@ class ServerSpec {
   lateinit var inputStream: InputStream
   lateinit var outputStream: OutputStream
 
-  @Before
+  @BeforeMethod
   fun setUp() {
     socket = Socket("localhost", 7080)
     inputStream = socket.inputStream
     outputStream = socket.outputStream
   }
 
-  @After
+  @AfterMethod
   fun tearDown() {
     socket.close()
   }
 
-  @Test(timeout = 10000)
+  @Test(timeOut = 10000)
   fun testRegistration() {
     val deviceMetaData = DeviceMetaDataDto(
       deviceId = UUID.randomUUID().toString(),
