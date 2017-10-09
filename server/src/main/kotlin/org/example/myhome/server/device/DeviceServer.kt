@@ -2,7 +2,6 @@ package org.example.myhome.server.device
 
 import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelInitializer
-import io.netty.channel.ChannelPipeline
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.SocketChannel
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder

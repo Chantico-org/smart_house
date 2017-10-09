@@ -50,7 +50,7 @@ class ServerSpec {
     assertThat(inputStream.read(), equalTo(-1))
   }
 
-  @Test(timeout = 10000)
+  @Test(timeOut = 10000)
   fun testInitialFrameLimit() {
     val random = EnhancedRandomBuilder.aNewEnhancedRandomBuilder()
       .stringLengthRange(255, 255)
