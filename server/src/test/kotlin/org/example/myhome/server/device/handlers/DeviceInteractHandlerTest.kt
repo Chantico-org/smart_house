@@ -5,7 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import io.netty.channel.ChannelHandlerContext
 import org.example.myhome.simp.core.SimpMessage
 import org.example.myhome.simp.core.SimpMessageType
-import org.example.myhome.utils.objectMapper
+import org.example.myhome.utils.readTree
 import org.example.myhome.utils.writeValue
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito
@@ -50,7 +50,7 @@ class DeviceInteractHandlerTest {
     StepVerifier.create(handler.send("test", requestBody))
       .then {
         Mockito.verify(context).writeAndFlush(captor.capture())
-        val config = objectMapper.readTree(captor.value.body)
+        val config = readTree(captor.value.body)
         assertThat(config.hasNonNull("id"), equalTo(true))
         val message = mapOf(
           "id" to config["id"].asInt(),
