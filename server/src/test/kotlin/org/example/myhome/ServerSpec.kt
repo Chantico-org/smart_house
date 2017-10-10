@@ -2,6 +2,8 @@ package org.example.myhome
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import io.github.benas.randombeans.EnhancedRandomBuilder
+import io.github.benas.randombeans.api.EnhancedRandom
 import org.example.myhome.dto.DeviceMetaDataDto
 import org.example.myhome.simp.core.SimpMessageType
 import org.testng.annotations.AfterMethod
@@ -44,6 +46,17 @@ class ServerSpec {
     val response = inputStream.readSimpMessage()
     assertThat(response.type, equalTo(SimpMessageType.RESPONSE))
     assertThat(response.body, equalTo("NO"))
+//    assert that client is disconnected
+    assertThat(inputStream.read(), equalTo(-1))
+  }
+
+  @Test(timeOut = 10000)
+  fun testInitialFrameLimit() {
+    val random = EnhancedRandomBuilder.aNewEnhancedRandomBuilder()
+      .stringLengthRange(255, 255)
+      .build()
+    val message = random.nextObject(String::class.java)
+    outputStream.writeString(message, SimpMessageType.REQUEST)
 //    assert that client is disconnected
     assertThat(inputStream.read(), equalTo(-1))
   }

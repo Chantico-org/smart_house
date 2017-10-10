@@ -7,8 +7,8 @@ import org.example.myhome.simp.core.SimpMessage
 import org.example.myhome.simp.core.SimpMessageHandler
 import org.example.myhome.simp.core.SimpMessageType
 import org.example.myhome.utils.MessageSegment
-import org.example.myhome.utils.objectMapper
 import org.example.myhome.utils.parse
+import org.example.myhome.utils.readTree
 import org.example.myhome.utils.writeValue
 import reactor.core.publisher.Flux
 import reactor.core.publisher.FluxSink
@@ -48,14 +48,14 @@ class DeviceInteractHandler : SimpMessageHandler() {
     channelHandlerContext.channel().closeFuture()
 
   private fun handleResponse(responseBody: String) {
-    val json = objectMapper.readTree(responseBody)
+    val json = readTree(responseBody)
     val body: String = parse(json, MessageSegment.BODY)
     val correlationId: Int = parse(json, MessageSegment.ID)
     senderSinkMap[correlationId]?.success(body)
   }
 
   private fun handleMessage(messageBody: String) {
-    val json = objectMapper.readTree(messageBody)
+    val json = readTree(messageBody)
     val topic: String = parse(json, MessageSegment.TOPIC)
     val body: String = parse(json, MessageSegment.BODY)
     subscriptionSinkMap[topic]?.next(body)

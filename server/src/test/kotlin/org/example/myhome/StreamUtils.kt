@@ -4,7 +4,6 @@ import org.example.myhome.simp.core.SimpMessage
 import org.example.myhome.simp.core.SimpMessageType
 import org.example.myhome.simp.core.inferTypeFromByte
 import org.example.myhome.simp.core.toInt
-import org.example.myhome.utils.parseJson
 import org.example.myhome.utils.writeValue
 import java.io.InputStream
 import java.io.OutputStream
@@ -31,10 +30,6 @@ fun InputStream.readSimpMessage(): SimpMessage {
     type = inferTypeFromByte(text[0].toByte()),
     body = text.substring(1)
   )
-}
-
-fun <T> InputStream.readJson(clazz: Class<T>): T {
-  return parseJson(this.readString(), clazz)
 }
 
 fun OutputStream.writeString(data: String, type: SimpMessageType) {

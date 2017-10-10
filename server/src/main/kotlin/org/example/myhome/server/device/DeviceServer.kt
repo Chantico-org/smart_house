@@ -4,7 +4,6 @@ import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.SocketChannel
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder
 import io.netty.handler.codec.LengthFieldPrepender
 import io.netty.handler.logging.LoggingHandler
 import org.example.myhome.server.device.handlers.DeviceRegistration
@@ -23,16 +22,20 @@ open class DeviceServer(
   private val workerGroup: NioEventLoopGroup,
   private val deviceRegisterService: DeviceRegisterService
 ) {
+
+//  sharable channel handlers
+  private val lengthFieldPrepender = LengthFieldPrepender(4)
+  private val simpCodec = SimpCodec()
+  private val loggingHandler = LoggingHandler()
+
   open fun start(): ChannelFuture? {
     val init = object : ChannelInitializer<SocketChannel>() {
       override fun initChannel(ch: SocketChannel?) {
+        ch?.pipeline()?.addFirst(LENGTH_DECODER, createLengthDecoder(INITIAL_FRAME_LIMIT))
         ch?.pipeline()?.addLast(
-//          decoders
-          LengthFieldBasedFrameDecoder(Int.MAX_VALUE, 0, 4, 0, 4),
-//          encoders
-          LengthFieldPrepender(4),
-          SimpCodec(),
-          LoggingHandler(),
+          lengthFieldPrepender,
+          simpCodec,
+          loggingHandler,
           DeviceRegistration(deviceRegisterService)
         )
       }

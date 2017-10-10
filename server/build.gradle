@@ -75,6 +75,8 @@ dependencies {
   testCompile group: 'com.netflix.feign', name: 'feign-core', version: feign_version
   // https://mvnrepository.com/artifact/org.mockito/mockito-all
   testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
+  // https://mvnrepository.com/artifact/io.github.benas/random-beans
+  testCompile group: 'io.github.benas', name: 'random-beans', version: '3.7.0'
   // https://mvnrepository.com/artifact/io.projectreactor.addons/reactor-test
   testCompile group: 'io.projectreactor.addons', name: 'reactor-test', version: reactor_version
 }

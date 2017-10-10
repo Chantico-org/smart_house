@@ -2,15 +2,17 @@ package org.example.myhome.utils
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 
 val objectMapper = ObjectMapper().registerKotlinModule()
 
-fun <T> parseJson(message: String, clazz: Class<T>) =
-  objectMapper.readValue(message, clazz)
-
 fun writeValue(message: Any) =
   objectMapper.writeValueAsString(message)
+
+inline fun <reified T: Any> readValue(content: String): T = objectMapper.readValue(content)
+
+fun readTree(content: String) = objectMapper.readTree(content)
 
 enum class MessageSegment(val segmentName: String) {
   BODY("body"),

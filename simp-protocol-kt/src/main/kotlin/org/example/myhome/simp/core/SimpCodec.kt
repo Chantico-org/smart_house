@@ -2,6 +2,7 @@ package org.example.myhome.simp.core
 
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.ByteBufUtil
+import io.netty.channel.ChannelHandler.Sharable
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.MessageToMessageCodec
 import java.nio.CharBuffer
@@ -10,6 +11,7 @@ import java.nio.charset.Charset
 /**
  * Created by alexei on 15.06.17.
  */
+@Sharable
 class SimpCodec(
   val charset: Charset = Charset.defaultCharset()
 ): MessageToMessageCodec<ByteBuf, SimpMessage>() {
